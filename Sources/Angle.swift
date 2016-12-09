@@ -14,18 +14,18 @@ public struct Angle {
     }
 
 	/// Creates an instance using the value in radians
-    @inline(__always)
+    //@inline(__always)
     public init(radians val: Float) {
         degrees = val / Float.pi * 180.0
     }
 	
 	/// Creates an instance using the value in degrees
-    @inline(__always)
+    //@inline(__always)
     public init(degrees val: Float) {
         degrees = val
     }
     
-    @inline(__always)
+    //@inline(__always)
     internal init(_ val: Float) {
         degrees = val
     }
@@ -68,66 +68,66 @@ extension Angle {
     
     // MARK: multiplication (scaling)
     
-    @inline(__always)
+    //@inline(__always)
     public static func *=(lhs: inout Angle, rhs: Float) {
         lhs = Angle(lhs.degrees * rhs)
     }
     
-    @inline(__always)
+    //@inline(__always)
     public static func *(lhs: Angle, rhs: Float) -> Angle {
         return Angle(lhs.degrees * rhs)
     }
     
-    @inline(__always)
+    //@inline(__always)
     public static func *(lhs: Float, rhs: Angle) -> Angle {
         return Angle(rhs.degrees * lhs)
     }
     
     // MARK: division (scaling)
     
-    @inline(__always)
+    //@inline(__always)
     public static func /=(lhs: inout Angle, rhs: Float) {
         lhs = Angle(lhs.degrees / rhs)
     }
     
-    @inline(__always)
+    //@inline(__always)
     public static func /(lhs: Angle, rhs: Float) -> Angle {
         return Angle(lhs.degrees / rhs)
     }
     
     // MARK: addition
     
-    @inline(__always)
+    //@inline(__always)
     public static func +=(lhs: inout Angle, rhs: Angle) {
         lhs = Angle(lhs.degrees + rhs.degrees)
     }
     
-    @inline(__always)
+    //@inline(__always)
     public static func +(lhs: Angle, rhs: Angle) -> Angle {
         return Angle(lhs.degrees + rhs.degrees)
     }
     
     // MARK: subtraction
     
-    @inline(__always)
+    //@inline(__always)
     public static func -=(lhs: inout Angle, rhs: Angle) {
         lhs = Angle(lhs.degrees - rhs.degrees)
     }
     
-    @inline(__always)
+    //@inline(__always)
     public static func -(lhs: Angle, rhs: Angle) -> Angle {
         return Angle(lhs.degrees - rhs.degrees)
     }
     
     // MARK: Modulus
     
-    @inline(__always)
+    //@inline(__always)
     public static func %(lhs: Angle, rhs: Angle) -> Angle {
         return Angle(lhs.degrees.truncatingRemainder(dividingBy: rhs.degrees))
     }
     
     // MARK: Unary
-    @inline(__always)
+    //@inline(__always)
     public static prefix func -(lhs: Angle) -> Angle {
         return Angle(-lhs.degrees)
     }
@@ -136,7 +136,7 @@ extension Angle {
 // MARK: - Equatable
 
 extension Angle: Equatable {
-	@inline(__always)
+	//@inline(__always)
     public static func ==(lhs: Angle, rhs: Angle) -> Bool {
         return lhs.degrees == rhs.degrees
     }
@@ -145,22 +145,22 @@ extension Angle: Equatable {
 // MARK: - Comparable
 
 extension Angle: Comparable {
-	@inline(__always)
+	//@inline(__always)
 	public static func <(lhs: Angle, rhs: Angle) -> Bool {
 		return lhs.degrees < rhs.degrees
 	}
 	
-	@inline(__always)
+	//@inline(__always)
 	public static func <=(lhs: Angle, rhs: Angle) -> Bool {
 		return lhs.degrees <= rhs.degrees
 	}
 	
-	@inline(__always)
+	//@inline(__always)
 	public static func >(lhs: Angle, rhs: Angle) -> Bool {
 		return lhs.degrees > rhs.degrees
 	}
 	
-	@inline(__always)
+	//@inline(__always)
 	public static func >=(lhs: Angle, rhs: Angle) -> Bool {
 		return lhs.degrees >= rhs.degrees
 	}
@@ -176,13 +176,13 @@ postfix operator °
 /// - remark: 
 /// * Degree operator is the unicode symbol U+00B0 DEGREE SIGN
 /// * macOS shortcut is ⌘+⇧+8
-@inline(__always)
+//@inline(__always)
 public postfix func °(lhs: Float) -> Angle {
     return Angle(degrees: lhs)
 }
 
 /// Constructs an `Angle` from the specified `Int` value in degrees
-@inline(__always)
+//@inline(__always)
 public postfix func °(lhs: Int) -> Angle {
     return Angle(degrees: Float(lhs))
 }
@@ -190,13 +190,13 @@ public postfix func °(lhs: Int) -> Angle {
 // MARK: - Convenience functions
 
 /// Constructs an `Angle` from the specified floating point value in degrees
-@inline(__always)
+//@inline(__always)
 public func deg(_ a: Float) -> Angle {
     return Angle(degrees: a)
 }
 
 /// Constructs an `Angle` from the specified floating point value in radians
-@inline(__always)
+//@inline(__always)
 public func rad(_ a: Float) -> Angle {
     return Angle(radians: a)
 }

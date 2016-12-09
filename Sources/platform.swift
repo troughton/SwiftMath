@@ -6,24 +6,24 @@
 
 import Glibc
     
-@inline(__always)
+//@inline(__always)
 internal func __sincospif(_ a: Float, _ sina: inout Float, _ cosa: inout Float) {
     sina = sin(a * Float.pi)
     cosa = cos(a * Float.pi)
 }
 	
-@inline(__always)
+//@inline(__always)
 internal func __sinpif(_ a: Float) -> Float {
 	return sin(a * Float.pi)
 }
 
 
-@inline(__always)
+//@inline(__always)
 internal func __cospif(_ a: Float) -> Float {
 	return cos(a * Float.pi)
 }
 
-@inline(__always)
+//@inline(__always)
 internal func __tanpif(_ a: Float) -> Float {
     return tan(a * Float.pi)
 }
@@ -34,12 +34,12 @@ import Darwin
 
 #endif
 
-@inline(__always)
+//@inline(__always)
 public func sincos(_ a: Angle, _ sina: inout Float, _ cosa: inout Float)  {
     __sincospif(a.degrees / 180.0, &sina, &cosa)
 }
 
-@inline(__always)
+//@inline(__always)
 public func sincos(_ a: Angle) -> (sin: Float, cos: Float) {
     var s: Float = 0.0
     var c: Float = 0.0
@@ -48,17 +48,17 @@ public func sincos(_ a: Angle) -> (sin: Float, cos: Float) {
     return (sin: s, cos: c)
 }
 
-@inline(__always)
+//@inline(__always)
 public func sin(_ a: Angle) -> Float {
 	return __sinpif(a.degrees / 180.0)
 }
 
-@inline(__always)
+//@inline(__always)
 public func cos(_ a: Angle) -> Float {
 	return __cospif(a.degrees / 180.0)
 }
 
-@inline(__always)
+//@inline(__always)
 public func tan(_ a: Angle) -> Float {
     return __tanpif(a.degrees / 180.0)
 }
