@@ -36,6 +36,14 @@ public struct Matrix4x4f {
         self.d = float4x4(matrix_float4x4(columns: (c0.d, c1.d, c2.d, c3.d)))
     }
     
+    public var determinant: Float {
+        return matrix_determinant(self.d.cmatrix)
+    }
+    
+    public var transpose: Matrix4x4f {
+        return unsafeBitCast(d.transpose, to: Matrix4x4f.self)
+    }
+    
     //MARK:- properties
     
     public var inversed: Matrix4x4f {
