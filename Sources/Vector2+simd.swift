@@ -90,33 +90,33 @@ public extension Vector2f {
     }
     
     //MARK: - operators
-    
-    public static func +(lhs: Vector2f, rhs: Vector2f) -> Vector2f {
-        return unsafeBitCast(lhs.d + rhs.d, to: Vector2f.self)
-    }
-    
-    public static func -(lhs: Vector2f, rhs: Vector2f) -> Vector2f {
-        return unsafeBitCast(lhs.d - rhs.d, to: Vector2f.self)
-    }
 
     public static prefix func -(lhs: Vector2f) -> Vector2f {
         return unsafeBitCast(-lhs.d, to: Vector2f.self)
     }
     
-    public static func *(lhs: Vector2f, rhs: Float) -> Vector2f {
-        return unsafeBitCast(lhs.d * rhs, to: Vector2f.self)
+    public static func +=(lhs: inout Vector2f, rhs: Vector2f) {
+        lhs.d += rhs.d
     }
     
-    public static func *(lhs: Vector2f, rhs: Vector2f) -> Vector2f {
-        return unsafeBitCast(lhs.d * rhs.d, to: Vector2f.self)
+    public static func -=(lhs: inout Vector2f, rhs: Vector2f) {
+        lhs.d -= rhs.d
     }
     
-    public static func /(lhs: Vector2f, rhs: Float) -> Vector2f {
-        return unsafeBitCast(lhs.d * (1.0 / rhs), to: Vector2f.self)
+    public static func *=(lhs: inout Vector2f, rhs: Vector2f) {
+        lhs.d *= rhs.d
     }
     
-    public static func /(lhs: Vector2f, rhs: Vector2f) -> Vector2f {
-        return unsafeBitCast(lhs.d / rhs.d, to: Vector2f.self)
+    public static func *=(lhs: inout Vector2f, rhs: Float) {
+        lhs.d *= rhs
+    }
+    
+    public static func /=(lhs: inout Vector2f, rhs: Vector2f) {
+        lhs.d /= rhs.d
+    }
+    
+    public static func /=(lhs: inout Vector2f, rhs: Float) {
+        lhs.d *= (1.0 / rhs)
     }
     
     public static func *(lhs: Matrix4x4f, rhs: Vector2f) -> Vector2f {

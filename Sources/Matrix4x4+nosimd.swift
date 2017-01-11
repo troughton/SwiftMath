@@ -338,3 +338,58 @@ public extension Matrix4x4f {
 }
     
 #endif
+
+public extension Matrix4x4f {
+    
+    /// Creates a new instance from the values provided in row-major order
+    public init(
+        _ m00: Float, _ m01: Float, _ m02: Float, _ m03: Float,
+        _ m10: Float, _ m11: Float, _ m12: Float, _ m13: Float,
+        _ m20: Float, _ m21: Float, _ m22: Float, _ m23: Float,
+        _ m30: Float, _ m31: Float, _ m32: Float, _ m33: Float) {
+        self.init(
+            vec4(m00, m10, m20, m30),
+            vec4(m01, m11, m21, m31),
+            vec4(m02, m12, m22, m32),
+            vec4(m03, m13, m23, m33)
+        )
+    }
+    
+    public init(_ array: [Float]) {
+        self = Matrix4x4f()
+        for (i, val) in array.enumerated() {
+            self[i / 4][i % 4] = val
+        }
+    }
+    
+    public init(quaternion q: Quaternion) {
+        self = Matrix4x4f.identity
+        
+        let sqw = q.w*q.w
+        let sqx = q.x*q.x
+        let sqy = q.y*q.y
+        let sqz = q.z*q.z
+        
+        // invs (inverse square length) is only required if quaternion is not already normalised
+        let invs = 1.0 / (sqx + sqy + sqz + sqw)
+        self[0, 0] = ( sqx - sqy - sqz + sqw)*invs // since sqw + sqx + sqy + sqz =1/invs*invs
+        self[1, 1] = (-sqx + sqy - sqz + sqw)*invs
+        self[2, 2] = (-sqx - sqy + sqz + sqw)*invs
+        
+        var tmp1 = q.x*q.y
+        var tmp2 = q.z*q.w
+        self[0, 1] = 2.0 * (tmp1 + tmp2)*invs
+        self[1, 0] = 2.0 * (tmp1 - tmp2)*invs
+        
+        tmp1 = q.x*q.z
+        tmp2 = q.y*q.w
+        self[0, 2] = 2.0 * (tmp1 - tmp2)*invs
+        self[2, 0] = 2.0 * (tmp1 + tmp2)*invs
+        tmp1 = q.y*q.z
+        tmp2 = q.x*q.w
+        self[1, 2] = 2.0 * (tmp1 + tmp2)*invs
+        self[2, 1] = 2.0 * (tmp1 - tmp2)*invs
+    }
+}
+
+

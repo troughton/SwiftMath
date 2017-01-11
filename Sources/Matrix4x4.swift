@@ -9,27 +9,6 @@
 public extension Matrix4x4f {
     /// Returns the identity matrix
     public static let identity = Matrix4x4f(diagonal: vec4(1.0))
-	
-	/// Creates a new instance from the values provided in row-major order
-    public init(
-        _ m00: Float, _ m01: Float, _ m02: Float, _ m03: Float,
-        _ m10: Float, _ m11: Float, _ m12: Float, _ m13: Float,
-        _ m20: Float, _ m21: Float, _ m22: Float, _ m23: Float,
-        _ m30: Float, _ m31: Float, _ m32: Float, _ m33: Float) {
-        self.init(
-            vec4(m00, m10, m20, m30),
-            vec4(m01, m11, m21, m31),
-            vec4(m02, m12, m22, m32),
-            vec4(m03, m13, m23, m33)
-        )
-    }
-    
-    public init(_ array: [Float]) {
-        self = Matrix4x4f()
-        for (i, val) in array.enumerated() {
-            self[i / 4][i % 4] = val
-        }
-    }
     
     //MARK: matrix operations
     

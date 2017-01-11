@@ -88,28 +88,34 @@
             return Vector2f(-v.x, -v.y)
         }
         
-        public static func +(lhs: Vector2f, rhs: Vector2f) -> Vector2f {
-            return Vector2f(lhs.x + rhs.x, lhs.y + rhs.y)
+        public static func +=(lhs: inout Vector2f, rhs: Vector2f) {
+            lhs.x += rhs.x
+            lhs.y += rhs.y
         }
         
-        public static func -(lhs: Vector2f, rhs: Vector2f) -> Vector2f {
-            return Vector2f(lhs.x - rhs.x, lhs.y - rhs.y)
+        public static func -=(lhs: inout Vector2f, rhs: Vector2f) {
+            lhs.x -= rhs.x
+            lhs.y -= rhs.y
         }
         
-        public static func *(lhs: Vector2f, rhs: Vector2f) -> Vector2f {
-            return Vector2f(lhs.x * rhs.x, lhs.y * rhs.y)
+        public static func *=(lhs: inout Vector2f, rhs: Vector2f) {
+            lhs.x *= rhs.x
+            lhs.y *= rhs.y
         }
         
-        public static func *(lhs: Vector2f, rhs: Float) -> Vector2f {
-            return Vector2f(lhs.x * rhs, lhs.y * rhs)
+        public static func *=(lhs: inout Vector2f, rhs: Float) {
+            lhs.x *= rhs
+            lhs.y *= rhs
         }
         
-        public static func /(lhs: Vector2f, rhs: Vector2f) -> Vector2f {
-            return Vector2f(lhs.x / rhs.x, lhs.y / rhs.y)
+        public static func /=(lhs: inout Vector2f, rhs: Vector2f) {
+            lhs.x /= rhs.x
+            lhs.y /= rhs.y
         }
         
-        public static func /(lhs: Vector2f, rhs: Float) -> Vector2f {
-            return Vector2f(lhs.x / rhs, lhs.y / rhs)
+        public static func /=(lhs: inout Vector2f, rhs: Float) {
+            lhs.x /= rhs
+            lhs.y /= rhs
         }
         
         public static func ==(lhs: Vector2f, rhs: Vector2f) -> Bool {

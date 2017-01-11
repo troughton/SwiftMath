@@ -18,57 +18,74 @@ public struct Vector4f {
     public var y: Float = 0.0
     public var z: Float = 0.0
     public var w: Float = 0.0
+}
     
-    public var r: Float { get { return x } set { x = newValue } }
-    public var g: Float { get { return y } set { y = newValue } }
-    public var b: Float { get { return z } set { z = newValue } }
-    public var a: Float { get { return w } set { w = newValue } }
-    
-    public var s: Float { get { return x } set { x = newValue } }
-    public var t: Float { get { return y } set { y = newValue } }
-    public var p: Float { get { return z } set { z = newValue } }
-    public var q: Float { get { return w } set { w = newValue } }
-    
-    public subscript(x: Int) -> Float {
-        get {
-            if x == 0 { return self.x }
-            if x == 1 { return self.y }
-            if x == 2 { return self.z }
-            if x == 3 { return self.w }
-            fatalError("Index outside of bounds")
+    public extension Vector4f {
+        //MARK: - initializers
+        
+        public init(_ scalar: Float) {
+            self.x = scalar
+            self.y = scalar
+            self.z = scalar
+            self.w = scalar
         }
         
-        set {
-            if x == 0 { self.x = newValue; return }
-            if x == 1 { self.y = newValue; return }
-            if x == 2 { self.z = newValue; return }
-            if x == 3 { self.w = newValue; return }
-            fatalError("Index outside of bounds")
+        public init(_ x: Float, _ y: Float, _ z: Float, _ w: Float) {
+            self.x = x
+            self.y = y
+            self.z = z
+            self.w = w
         }
+            
+            public init(_ v: Vector2f) {
+                self.init(v.x, v.y, 0.0, 1.0)
+            }
+            
+            public init(_ v: Vector3f) {
+                self.init(v.x, v.y, v.z, 1.0)
+            }
+            
+            public init(x: Int, y: Int, z: Int, w: Int) {
+                self.init(x: Float(x), y: Float(y), z: Float(z), w: Float(w))
+            }
+            
+            public init(_ x: Int, _ y: Int, _ z: Int, _ w: Int) {
+                self.init(x: Float(x), y: Float(y), z: Float(z), w: Float(w))
+            }
+            
+            public init(_ xyz: Vector3f, _ w: Float) {
+                self = Vector4f(xyz.x, xyz.y, xyz.z, w)
+            }
+        
+        public var r: Float { get { return x } set { x = newValue } }
+        public var g: Float { get { return y } set { y = newValue } }
+        public var b: Float { get { return z } set { z = newValue } }
+        public var a: Float { get { return w } set { w = newValue } }
+        
+        public var s: Float { get { return x } set { x = newValue } }
+        public var t: Float { get { return y } set { y = newValue } }
+        public var p: Float { get { return z } set { z = newValue } }
+        public var q: Float { get { return w } set { w = newValue } }
+        
+        public subscript(x: Int) -> Float {
+            get {
+                if x == 0 { return self.x }
+                if x == 1 { return self.y }
+                if x == 2 { return self.z }
+                if x == 3 { return self.w }
+                fatalError("Index outside of bounds")
+            }
+            
+            set {
+                if x == 0 { self.x = newValue; return }
+                if x == 1 { self.y = newValue; return }
+                if x == 2 { self.z = newValue; return }
+                if x == 3 { self.w = newValue; return }
+                fatalError("Index outside of bounds")
+            }
+        }
+
     }
-    
-    //MARK: - initializers
-    
-    public init() {}
-    
-    public init(_ scalar: Float) {
-        self.x = scalar
-        self.y = scalar
-        self.z = scalar
-        self.w = scalar
-    }
-    
-    public init(_ x: Float, _ y: Float, _ z: Float, _ w: Float) {
-        self.x = x
-        self.y = y
-        self.z = z
-        self.w = w
-    }
-    
-    public init(x: Float, y: Float, z: Float, w: Float) {
-        self.init(x, y, z, w)
-    }
-}
 
 extension Vector4f: Equatable {
 
@@ -100,20 +117,25 @@ extension Vector4f: Equatable {
         return Vector4f(-v.x, -v.y, -v.z, -v.w)
     }
     
-    public static func +(lhs: Vector4f, rhs: Vector4f) -> Vector4f {
-        return Vector4f(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w)
+    public static func +=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs.x += rhs.x
+        lhs.y += rhs.y
+        lhs.z += rhs.z
+        lhs.w += rhs.w
     }
     
-    public static func -(lhs: Vector4f, rhs: Vector4f) -> Vector4f {
-        return Vector4f(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w)
+    public static func -=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs.x -= rhs.x
+        lhs.y -= rhs.y
+        lhs.z -= rhs.z
+        lhs.w -= rhs.w
     }
     
-    public static func *(lhs: Vector4f, rhs: Vector4f) -> Vector4f {
-        return Vector4f(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.w * rhs.w)
-    }
-    
-    public static func *(lhs: Vector4f, rhs: Float) -> Vector4f {
-        return Vector4f(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.w * rhs)
+    public static func *=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs.x *= rhs.x
+        lhs.y *= rhs.y
+        lhs.z *= rhs.z
+        lhs.w *= rhs.w
     }
     
     public static func *=(lhs: inout Vector4f, rhs: Float) {
@@ -121,6 +143,20 @@ extension Vector4f: Equatable {
         lhs.y *= rhs
         lhs.z *= rhs
         lhs.w *= rhs
+    }
+    
+    public static func /=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs.x /= rhs.x
+        lhs.y /= rhs.y
+        lhs.z /= rhs.z
+        lhs.w /= rhs.w
+    }
+    
+    public static func /=(lhs: inout Vector4f, rhs: Float) {
+        lhs.x /= rhs
+        lhs.y /= rhs
+        lhs.z /= rhs
+        lhs.w /= rhs
     }
     
     public static func *(lhs: Vector4f, rhs: Matrix4x4f) -> Vector4f {
@@ -134,14 +170,6 @@ extension Vector4f: Equatable {
     
     public static func *(lhs: Matrix4x4f, rhs: Vector4f) -> Vector4f {
         return rhs * lhs
-    }
-    
-    public static func /(lhs: Vector4f, rhs: Vector4f) -> Vector4f {
-        return Vector4f(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z, lhs.w / rhs.w)
-    }
-    
-    public static func /(lhs: Vector4f, rhs: Float) -> Vector4f {
-        return Vector4f(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs, lhs.w / rhs)
     }
     
     public static func ==(lhs: Vector4f, rhs: Vector4f) -> Bool {

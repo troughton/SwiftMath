@@ -19,6 +19,24 @@ public struct Vector3f {
     public var y: Float = 0.0
     public var z: Float = 0.0
     
+    public init() {}
+    
+    public init(_ x: Float, _ y: Float, _ z: Float) {
+        self.x = x
+        self.y = y
+        self.z = z
+    }
+    
+    public init(_ scalar: Float) {
+        self.init(scalar, scalar, scalar)
+    }
+    
+    public init(x: Float, y: Float, z: Float) {
+        self.init(x, y, z)
+    }
+}
+    
+public extension Vector3f {
     public var r: Float { get { return x } set { x = newValue } }
     public var g: Float { get { return y } set { y = newValue } }
     public var b: Float { get { return z } set { z = newValue } }
@@ -42,22 +60,7 @@ public struct Vector3f {
             fatalError("Index outside of bounds")
         }
     }
-    
-    public init() {}
-    
-    public init(_ x: Float, _ y: Float, _ z: Float) {
-        self.x = x
-        self.y = y
-        self.z = z
-    }
-    
-    public init(_ scalar: Float) {
-        self.init(scalar, scalar, scalar)
-    }
-    
-    public init(x: Float, y: Float, z: Float) {
-        self.init(x, y, z)
-    }
+
 }
 
 extension Vector3f: Equatable {
@@ -94,28 +97,40 @@ extension Vector3f: Equatable {
         return Vector3f(-v.x, -v.y, -v.z)
     }
     
-    public static func +(lhs: Vector3f, rhs: Vector3f) -> Vector3f {
-        return Vector3f(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z)
+    public static func +=(lhs: inout Vector3f, rhs: Vector3f) {
+        lhs.x += rhs.x
+        lhs.y += rhs.y
+        lhs.z += rhs.z
     }
     
-    public static func -(lhs: Vector3f, rhs: Vector3f) -> Vector3f {
-        return Vector3f(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z)
+    public static func -=(lhs: inout Vector3f, rhs: Vector3f) {
+        lhs.x -= rhs.x
+        lhs.y -= rhs.y
+        lhs.z -= rhs.z
     }
     
-    public static func *(lhs: Vector3f, rhs: Vector3f) -> Vector3f {
-        return Vector3f(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z)
+    public static func *=(lhs: inout Vector3f, rhs: Vector3f) {
+        lhs.x *= rhs.x
+        lhs.y *= rhs.y
+        lhs.z *= rhs.z
     }
     
-    public static func *(lhs: Vector3f, rhs: Float) -> Vector3f {
-        return Vector3f(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs)
+    public static func *=(lhs: inout Vector3f, rhs: Float) {
+        lhs.x *= rhs
+        lhs.y *= rhs
+        lhs.z *= rhs
     }
     
-    public static func /(lhs: Vector3f, rhs: Vector3f) -> Vector3f {
-        return Vector3f(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z)
+    public static func /=(lhs: inout Vector3f, rhs: Vector3f) {
+        lhs.x /= rhs.x
+        lhs.y /= rhs.y
+        lhs.z /= rhs.z
     }
     
-    public static func /(lhs: Vector3f, rhs: Float) -> Vector3f {
-        return Vector3f(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs)
+    public static func /=(lhs: inout Vector3f, rhs: Float) {
+        lhs.x /= rhs
+        lhs.y /= rhs
+        lhs.z /= rhs
     }
     
     public static func ==(lhs: Vector3f, rhs: Vector3f) -> Bool {

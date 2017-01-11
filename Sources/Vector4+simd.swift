@@ -55,6 +55,26 @@ public struct Vector4f {
         self.d = float4(x, y, z, w)
     }
     
+    public init(_ v: Vector2f) {
+        self.init(v.x, v.y, 0.0, 1.0)
+    }
+    
+    public init(_ v: Vector3f) {
+        self.init(v.x, v.y, v.z, 1.0)
+    }
+    
+    public init(x: Int, y: Int, z: Int, w: Int) {
+        self.init(x: Float(x), y: Float(y), z: Float(z), w: Float(w))
+    }
+    
+    public init(_ x: Int, _ y: Int, _ z: Int, _ w: Int) {
+        self.init(x: Float(x), y: Float(y), z: Float(z), w: Float(w))
+    }
+    
+    public init(_ xyz: Vector3f, _ w: Float) {
+        self = Vector4f(xyz.x, xyz.y, xyz.z, w)
+    }
+    
 }
 
 public extension Vector4f {
@@ -106,33 +126,33 @@ public extension Vector4f {
     }
     
     // MARK: - operators
-    
-    public static func +(lhs: Vector4f, rhs: Vector4f) -> Vector4f {
-        return unsafeBitCast(lhs.d + rhs.d, to: Vector4f.self)
-    }
-    
-    public static func -(lhs: Vector4f, rhs: Vector4f) -> Vector4f {
-        return unsafeBitCast(lhs.d - rhs.d, to: Vector4f.self)
-    }
 
     public static prefix func -(lhs: Vector4f) -> Vector4f {
         return unsafeBitCast(-lhs.d, to: Vector4f.self)
     }
     
-    public static func *(lhs: Vector4f, rhs: Float) -> Vector4f {
-        return unsafeBitCast(lhs.d * rhs, to: Vector4f.self)
+    public static func +=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs.d += rhs.d
     }
     
-    public static func *(lhs: Vector4f, rhs: Vector4f) -> Vector4f {
-        return unsafeBitCast(lhs.d * rhs.d, to: Vector4f.self)
+    public static func -=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs.d -= rhs.d
     }
     
-    public static func /(lhs: Vector4f, rhs: Float) -> Vector4f {
-        return unsafeBitCast(lhs.d * (1.0 / rhs), to: Vector4f.self)
+    public static func *=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs.d *= rhs.d
     }
     
-    public static func /(lhs: Vector4f, rhs: Vector4f) -> Vector4f {
-        return unsafeBitCast(lhs.d / rhs.d, to: Vector4f.self)
+    public static func *=(lhs: inout Vector4f, rhs: Float) {
+        lhs.d *= rhs
+    }
+    
+    public static func /=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs.d /= rhs.d
+    }
+    
+    public static func /=(lhs: inout Vector4f, rhs: Float) {
+        lhs.d *= (1.0 / rhs)
     }
     
     public static func *(lhs: Matrix4x4f, rhs: Vector4f) -> Vector4f {

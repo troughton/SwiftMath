@@ -27,19 +27,6 @@ public protocol Vector : Equatable {
     
     static prefix func -(v: Self) -> Self
     
-    static func +(lhs: Self, rhs: Self) -> Self
-    
-    static func -(lhs: Self, rhs: Self) -> Self
-    
-    static func *(lhs: Self, rhs: Self) -> Self
-    
-    static func *(lhs: Self, rhs: Float) -> Self
-    
-    static func /(lhs: Self, rhs: Self) -> Self
-    
-    static func /(lhs: Self, rhs: Float) -> Self
-
-    
     static func +=(lhs: inout Self, rhs: Self)
     static func -=(lhs: inout Self, rhs: Self)
     static func *=(lhs: inout Self, rhs: Self)
@@ -48,4 +35,42 @@ public protocol Vector : Equatable {
     static func *=(lhs: inout Self, rhs: Float)
     static func /=(lhs: inout Self, rhs: Float)
 
+}
+
+public extension Vector {
+    public static func +(lhs: Self, rhs: Self) -> Self {
+        var result = lhs
+        result += rhs
+        return result
+    }
+    
+    public static func -(lhs: Self, rhs: Self) -> Self {
+        var result = lhs
+        result -= rhs
+        return result
+    }
+    
+    public static func *(lhs: Self, rhs: Self) -> Self {
+        var result = lhs
+        result *= rhs
+        return result
+    }
+    
+    public static func *(lhs: Self, rhs: Float) -> Self {
+        var result = lhs
+        result *= rhs
+        return result
+    }
+    
+    public static func /(lhs: Self, rhs: Self) -> Self {
+        var result = lhs
+        result /= rhs
+        return result
+    }
+    
+    public static func /(lhs: Self, rhs: Float) -> Self {
+        var result = lhs
+        result /= rhs
+        return result
+    }
 }

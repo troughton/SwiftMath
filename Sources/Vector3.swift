@@ -39,31 +39,3 @@ extension Vector3f: CustomStringConvertible {
         return "Vector3f(x: \(x), y: \(y), z: \(z))"
     }
 }
-
-public extension Vector3f {
-    
-    public static func +=(lhs: inout Vector3f, rhs: Vector3f) {
-        lhs = lhs + rhs
-    }
-    
-    public static func -=(lhs: inout Vector3f, rhs: Vector3f) {
-        lhs = lhs - rhs
-    }
-    
-    public static func *=(lhs: inout Vector3f, rhs: Vector3f) {
-        lhs = lhs * rhs
-    }
-    
-    public static func /=(lhs: inout Vector3f, rhs: Vector3f) {
-        lhs = lhs / rhs
-    }
-    
-    public static func *=(lhs: inout Vector3f, rhs: Float) {
-        lhs = lhs * rhs
-    }
-    
-    public static func /=(lhs: inout Vector3f, rhs: Float) {
-        lhs = lhs / rhs
-    }
-    
-}

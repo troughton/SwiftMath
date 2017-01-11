@@ -243,33 +243,3 @@ public extension Quaternion {
     }
 }
 
-public extension Matrix4x4f {
-    public init(quaternion q: Quaternion) {
-        self = Matrix4x4f.identity
-        
-        let sqw = q.w*q.w
-        let sqx = q.x*q.x
-        let sqy = q.y*q.y
-        let sqz = q.z*q.z
-        
-        // invs (inverse square length) is only required if quaternion is not already normalised
-        let invs = 1.0 / (sqx + sqy + sqz + sqw)
-        self[0, 0] = ( sqx - sqy - sqz + sqw)*invs // since sqw + sqx + sqy + sqz =1/invs*invs
-        self[1, 1] = (-sqx + sqy - sqz + sqw)*invs
-        self[2, 2] = (-sqx - sqy + sqz + sqw)*invs
-        
-        var tmp1 = q.x*q.y
-        var tmp2 = q.z*q.w
-        self[0, 1] = 2.0 * (tmp1 + tmp2)*invs
-        self[1, 0] = 2.0 * (tmp1 - tmp2)*invs
-        
-        tmp1 = q.x*q.z
-        tmp2 = q.y*q.w
-        self[0, 2] = 2.0 * (tmp1 - tmp2)*invs
-        self[2, 0] = 2.0 * (tmp1 + tmp2)*invs
-        tmp1 = q.y*q.z
-        tmp2 = q.x*q.w
-        self[1, 2] = 2.0 * (tmp1 + tmp2)*invs
-        self[2, 1] = 2.0 * (tmp1 - tmp2)*invs
-    }
-}
