@@ -30,11 +30,9 @@ public struct Matrix4x4f {
         return [m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44]
     }
     
-    //@inline(__always)
     public init() {}
     
     /// Creates an instance using the vector to initialize the diagonal elements
-    //@inline(__always)
     public init(diagonal v: Vector4f) {
         m11 = v[0]
         m22 = v[1]
@@ -48,7 +46,6 @@ public struct Matrix4x4f {
     /// - parameter c1: a vector representing column 1
     /// - parameter c2: a vector representing column 2
     /// - parameter c3: a vector representing column 3
-    //@inline(__always)
     public init(_ c0: Vector4f, _ c1: Vector4f, _ c2: Vector4f, _ c3: Vector4f) {
         m11 = c0[0]
         m12 = c0[1]
@@ -85,10 +82,10 @@ public struct Matrix4x4f {
         
         set {
             switch col {
-            case 0: m11 = newValue[0]; m12 = newValue[2]; m12 = newValue[2]; m12 = newValue[2];
-            case 1: m21 = newValue[0]; m22 = newValue[2]; m22 = newValue[2]; m22 = newValue[2];
-            case 2: m31 = newValue[0]; m32 = newValue[2]; m32 = newValue[2]; m32 = newValue[2];
-            case 3: m41 = newValue[0]; m42 = newValue[2]; m42 = newValue[2]; m42 = newValue[2];
+            case 0: m11 = newValue[0]; m12 = newValue[1]; m12 = newValue[2]; m12 = newValue[3];
+            case 1: m21 = newValue[0]; m22 = newValue[1]; m22 = newValue[2]; m22 = newValue[3];
+            case 2: m31 = newValue[0]; m32 = newValue[1]; m32 = newValue[2]; m32 = newValue[3];
+            case 3: m41 = newValue[0]; m42 = newValue[1]; m42 = newValue[2]; m42 = newValue[3];
             default: fatalError("Index outside of bounds")
             }
         }
@@ -174,7 +171,7 @@ public struct Matrix4x4f {
     }
 }
     
-extension Matrix4x4f {
+public extension Matrix4x4f {
     public var adjugate: Matrix4x4f {
         var m = Matrix4x4f.identity
         
@@ -182,61 +179,61 @@ extension Matrix4x4f {
         m.m11 += -m32 * m23 * m44 + m32 * m24 * m43
         m.m11 += m42 * m23 * m34 - m42 * m24 * m33
         
-        m.m12 = -m21 * m33 * m44 + m21 * m34 * m43
-        m.m12 += m31 * m23 * m44 - m31 * m24 * m43
-        m.m12 += -m41 * m23 * m34 + m41 * m24 * m33
+        m.m21 = -m21 * m33 * m44 + m21 * m34 * m43
+        m.m21 += m31 * m23 * m44 - m31 * m24 * m43
+        m.m21 += -m41 * m23 * m34 + m41 * m24 * m33
         
-        m.m13 = m21 * m32 * m44 - m21 * m34 * m42
-        m.m13 += -m31 * m22 * m44 + m31 * m24 * m42
-        m.m13 += m41 * m22 * m34 - m41 * m24 * m32
+        m.m31 = m21 * m32 * m44 - m21 * m34 * m42
+        m.m31 += -m31 * m22 * m44 + m31 * m24 * m42
+        m.m31 += m41 * m22 * m34 - m41 * m24 * m32
         
-        m.m14 = -m21 * m32 * m43 + m21 * m33 * m42
-        m.m14 += m31 * m22 * m43 - m31 * m23 * m42
-        m.m14 += -m41 * m22 * m33 + m41 * m23 * m32
+        m.m41 = -m21 * m32 * m43 + m21 * m33 * m42
+        m.m41 += m31 * m22 * m43 - m31 * m23 * m42
+        m.m41 += -m41 * m22 * m33 + m41 * m23 * m32
         
-        m.m21 = -m12 * m33 * m44 + m12 * m34 * m43
-        m.m21 += m32 * m13 * m44 - m32 * m14 * m43
-        m.m21 += -m42 * m13 * m34 + m42 * m14 * m33
+        m.m12 = -m12 * m33 * m44 + m12 * m34 * m43
+        m.m12 += m32 * m13 * m44 - m32 * m14 * m43
+        m.m12 += -m42 * m13 * m34 + m42 * m14 * m33
         
         m.m22 = m11 * m33 * m44 - m11 * m34 * m43
         m.m22 += -m31 * m13 * m44 + m31 * m14 * m43
         m.m22 += m41 * m13 * m34 - m41 * m14 * m33
         
-        m.m23 = -m11 * m32 * m44 + m11 * m34 * m42
-        m.m23 += m31 * m12 * m44 - m31 * m14 * m42
-        m.m23 += -m41 * m12 * m34 + m41 * m14 * m32
+        m.m32 = -m11 * m32 * m44 + m11 * m34 * m42
+        m.m32 += m31 * m12 * m44 - m31 * m14 * m42
+        m.m32 += -m41 * m12 * m34 + m41 * m14 * m32
         
-        m.m24 = m11 * m32 * m43 - m11 * m33 * m42
-        m.m24 += -m31 * m12 * m43 + m31 * m13 * m42
-        m.m24 += m41 * m12 * m33 - m41 * m13 * m32
+        m.m42 = m11 * m32 * m43 - m11 * m33 * m42
+        m.m42 += -m31 * m12 * m43 + m31 * m13 * m42
+        m.m42 += m41 * m12 * m33 - m41 * m13 * m32
         
-        m.m31 = m12 * m23 * m44 - m12 * m24 * m43
-        m.m31 += -m22 * m13 * m44 + m22 * m14 * m43
-        m.m31 += m42 * m13 * m24 - m42 * m14 * m23
+        m.m13 = m12 * m23 * m44 - m12 * m24 * m43
+        m.m13 += -m22 * m13 * m44 + m22 * m14 * m43
+        m.m13 += m42 * m13 * m24 - m42 * m14 * m23
         
-        m.m32 = -m11 * m23 * m44 + m11 * m24 * m43
-        m.m32 += m21 * m13 * m44 - m21 * m14 * m43
-        m.m32 += -m41 * m13 * m24 + m41 * m14 * m23
+        m.m23 = -m11 * m23 * m44 + m11 * m24 * m43
+        m.m23 += m21 * m13 * m44 - m21 * m14 * m43
+        m.m23 += -m41 * m13 * m24 + m41 * m14 * m23
         
         m.m33 = m11 * m22 * m44 - m11 * m24 * m42
         m.m33 += -m21 * m12 * m44 + m21 * m14 * m42
         m.m33 += m41 * m12 * m24 - m41 * m14 * m22
         
-        m.m34 = -m11 * m22 * m43 + m11 * m23 * m42
-        m.m34 += m21 * m12 * m43 - m21 * m13 * m42
-        m.m34 += -m41 * m12 * m23 + m41 * m13 * m22
+        m.m43 = -m11 * m22 * m43 + m11 * m23 * m42
+        m.m43 += m21 * m12 * m43 - m21 * m13 * m42
+        m.m43 += -m41 * m12 * m23 + m41 * m13 * m22
         
-        m.m41 = -m12 * m23 * m34 + m12 * m24 * m33
-        m.m41 += m22 * m13 * m34 - m22 * m14 * m33
-        m.m41 += -m32 * m13 * m24 + m32 * m14 * m23
+        m.m14 = -m12 * m23 * m34 + m12 * m24 * m33
+        m.m14 += m22 * m13 * m34 - m22 * m14 * m33
+        m.m14 += -m32 * m13 * m24 + m32 * m14 * m23
         
-        m.m42 = m11 * m23 * m34 - m11 * m24 * m33
-        m.m42 += -m21 * m13 * m34 + m21 * m14 * m33
-        m.m42 += m31 * m13 * m24 - m31 * m14 * m23
+        m.m24 = m11 * m23 * m34 - m11 * m24 * m33
+        m.m24 += -m21 * m13 * m34 + m21 * m14 * m33
+        m.m24 += m31 * m13 * m24 - m31 * m14 * m23
         
-        m.m43 = -m11 * m22 * m34 + m11 * m24 * m32
-        m.m43 += m21 * m12 * m34 - m21 * m14 * m32
-        m.m43 += -m31 * m12 * m24 + m31 * m14 * m22
+        m.m34 = -m11 * m22 * m34 + m11 * m24 * m32
+        m.m34 += m21 * m12 * m34 - m21 * m14 * m32
+        m.m34 += -m31 * m12 * m24 + m31 * m14 * m22
         
         m.m44 = m11 * m22 * m33 - m11 * m23 * m32
         m.m44 += -m21 * m12 * m33 + m21 * m13 * m32
@@ -255,10 +252,10 @@ extension Matrix4x4f {
     
     public var transpose: Matrix4x4f {
         return Matrix4x4f(
-            m11, m12, m13, m14,
-            m21, m22, m23, m24,
-            m31, m32, m33, m34,
-            m41, m42, m43, m44
+            m11, m21, m31, m41,
+            m12, m22, m32, m42,
+            m13, m23, m33, m43,
+            m14, m24, m34, m44
         )
     }
     
