@@ -24,6 +24,13 @@ public extension Matrix4x4f {
         )
     }
     
+    public init(_ array: [Float]) {
+        self = Matrix4x4f()
+        for (i, val) in array.enumerated() {
+            self[i / 4][i % 4] = val
+        }
+    }
+    
     //MARK: matrix operations
     
     public static func lookAt(eye: Vector3f, at: Vector3f, up: Vector3f = Vector3f(0.0, 1.0, 0.0)) -> Matrix4x4f {
@@ -274,6 +281,30 @@ public extension Matrix4x4f {
             vec4(_sz * -cx*sy,             _sz * sx,     cx*cy,                   0.0),
             vec4(tx,                       ty,           tz,                      1.0)
         )
+    }
+    
+    /// Returns a transformation matrix which can be used to scale, rotate and translate vectors
+    public static func scaleRotateTranslate(scale: Vector3f,
+                                            rotation: Quaternion,
+                                            translation: Vector3f) -> Matrix4x4f {
+        let scale = Matrix4x4f.scale(sx: scale.x, sy: scale.y, sz: scale.z)
+        let rotation = Matrix4x4f(quaternion: rotation)
+        let translation = Matrix4x4f.translate(tx: translation.x, ty: translation.y, tz: translation.z)
+        return translation * rotation * scale
+    }
+    
+    public var decomposed : (translation: Vector3f, rotation: Quaternion, scale: Vector3f) {
+        var currentTransform = self
+        let translation = currentTransform[3].xyz
+        
+        currentTransform[3] = vec4(0, 0, 0, 1)
+        let scale = vec3(currentTransform[0].xyz.length, currentTransform[1].xyz.length, currentTransform[2].xyz.length)
+        currentTransform[0] /= scale.x
+        currentTransform[1] /= scale.y
+        currentTransform[2] /= scale.z
+        
+        let rotation = quat(currentTransform)
+        return (translation, rotation, scale)
     }
 }
 

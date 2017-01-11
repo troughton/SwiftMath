@@ -6,37 +6,37 @@
 public struct Angle {
 	
     /// The value of the angle in degrees
-    public let degrees: Float
+    public var degrees: Float {
+        return radians * 180.0 / Float.pi
+    }
 	
     /// The value of the angle in radians
-    public var radians: Float {
-        return degrees * Float.pi / 180.0
-    }
+    public let radians: Float
 
 	/// Creates an instance using the value in radians
     public init(radians val: Float) {
-        degrees = val / Float.pi * 180.0
+        radians = val
     }
 	
 	/// Creates an instance using the value in degrees
     public init(degrees val: Float) {
-        degrees = val
+        radians = val / 180.0 * Float.pi
     }
     
     internal init(_ val: Float) {
-        degrees = val
+        radians = val
     }
     
     // MARK: Constants
-    public static let zero  = 0°
+    public static let zero  = 0
     public static let pi_6  = 30°
     public static let pi_4  = 45°
     public static let pi_3  = 60°
-    public static let pi_2  = 90°
+    public static let pi_2  = Float.pi * 0.5
     public static let pi2_3 = 120°
-    public static let pi    = 180°
+    public static let pi    = Float.pi
     public static let pi3_2 = 270°
-    public static let pi2   = 360°
+    public static let pi2   = Float.pi * 2
 }
 
 extension Angle: CustomStringConvertible, CustomDebugStringConvertible, CustomPlaygroundQuickLookable {
@@ -66,57 +66,57 @@ extension Angle {
     // MARK: multiplication (scaling)
   
     public static func *=(lhs: inout Angle, rhs: Float) {
-        lhs = Angle(lhs.degrees * rhs)
+        lhs = Angle(lhs.radians * rhs)
     }
     
     public static func *(lhs: Angle, rhs: Float) -> Angle {
-        return Angle(lhs.degrees * rhs)
+        return Angle(lhs.radians * rhs)
     }
     
     public static func *(lhs: Float, rhs: Angle) -> Angle {
-        return Angle(rhs.degrees * lhs)
+        return Angle(rhs.radians * lhs)
     }
     
     // MARK: division (scaling)
     
     public static func /=(lhs: inout Angle, rhs: Float) {
-        lhs = Angle(lhs.degrees / rhs)
+        lhs = Angle(lhs.radians / rhs)
     }
     
     public static func /(lhs: Angle, rhs: Float) -> Angle {
-        return Angle(lhs.degrees / rhs)
+        return Angle(lhs.radians / rhs)
     }
     
     // MARK: addition
   
     public static func +=(lhs: inout Angle, rhs: Angle) {
-        lhs = Angle(lhs.degrees + rhs.degrees)
+        lhs = Angle(lhs.radians + rhs.degrees)
     }
     
     public static func +(lhs: Angle, rhs: Angle) -> Angle {
-        return Angle(lhs.degrees + rhs.degrees)
+        return Angle(lhs.radians + rhs.degrees)
     }
     
     // MARK: subtraction
     
     public static func -=(lhs: inout Angle, rhs: Angle) {
-        lhs = Angle(lhs.degrees - rhs.degrees)
+        lhs = Angle(lhs.radians - rhs.degrees)
     }
   
     public static func -(lhs: Angle, rhs: Angle) -> Angle {
-        return Angle(lhs.degrees - rhs.degrees)
+        return Angle(lhs.radians - rhs.degrees)
     }
     
     // MARK: Modulus
     
     public static func %(lhs: Angle, rhs: Angle) -> Angle {
-        return Angle(lhs.degrees.truncatingRemainder(dividingBy: rhs.degrees))
+        return Angle(lhs.radians.truncatingRemainder(dividingBy: rhs.radians))
     }
     
     // MARK: Unary
     
     public static prefix func -(lhs: Angle) -> Angle {
-        return Angle(-lhs.degrees)
+        return Angle(-lhs.radians)
     }
 }
 
@@ -124,7 +124,7 @@ extension Angle {
 
 extension Angle: Equatable {
     public static func ==(lhs: Angle, rhs: Angle) -> Bool {
-        return lhs.degrees == rhs.degrees
+        return lhs.radians == rhs.radians
     }
 }
 
@@ -132,19 +132,19 @@ extension Angle: Equatable {
 
 extension Angle: Comparable {
 	public static func <(lhs: Angle, rhs: Angle) -> Bool {
-		return lhs.degrees < rhs.degrees
+		return lhs.radians < rhs.radians
 	}
 	
 	public static func <=(lhs: Angle, rhs: Angle) -> Bool {
-		return lhs.degrees <= rhs.degrees
+		return lhs.radians <= rhs.radians
 	}
 	
 	public static func >(lhs: Angle, rhs: Angle) -> Bool {
-		return lhs.degrees > rhs.degrees
+		return lhs.radians > rhs.radians
 	}
 	
 	public static func >=(lhs: Angle, rhs: Angle) -> Bool {
-		return lhs.degrees >= rhs.degrees
+		return lhs.radians >= rhs.radians
 	}
 }
 

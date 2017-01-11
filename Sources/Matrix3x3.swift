@@ -18,6 +18,13 @@ public extension Matrix3x3f {
         )
     }
     
+    public init(_ array: [Float]) {
+        self = Matrix3x3f()
+        for (i, val) in array.enumerated() {
+            self[i / 3][i % 3] = val
+        }
+    }
+    
 }
 
 extension Matrix3x3f: CustomStringConvertible {

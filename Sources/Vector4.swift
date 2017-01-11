@@ -4,6 +4,8 @@
 
 public typealias vec4 = Vector4f
 
+extension Vector4f : Vector { }
+
 public extension Vector4f {
     //MARK: - initializers
     
@@ -22,6 +24,10 @@ public extension Vector4f {
     public init(_ x: Int, _ y: Int, _ z: Int, _ w: Int) {
         self.init(x: Float(x), y: Float(y), z: Float(z), w: Float(w))
     }
+    
+    public init(_ xyz: Vector3f, _ w: Float) {
+        self = Vector4f(xyz.x, xyz.y, xyz.z, w)
+    }
 }
 
 public extension Vector4f {
@@ -32,51 +38,36 @@ public extension Vector4f {
     public static let zero = Vector4f()
 }
 
-public extension Vector4f {
-    public var xyz: Vector3f {
-        get {
-            return Vector3f(x, y, z)
-        }
-        set (v) {
-            x = v.x
-            y = v.y
-            z = v.z
-        }
-    }
-    
-    public var xy: Vector2f {
-        get {
-            return Vector2f(x, y)
-        }
-        set (v) {
-            x = v.x
-            y = v.y
-        }
-    }
-    
-    public var xz: Vector2f {
-        get {
-            return Vector2f(x, z)
-        }
-        set (v) {
-            x = v.x
-            z = v.y
-        }
-    }
-    
-    public var yz: Vector2f {
-        get {
-            return Vector2f(y, z)
-        }
-        set (v) {
-            y = v.x
-            z = v.y
-        }
-    }
-}
-
 extension Vector4f: CustomStringConvertible {
     public var description: String {
         return "Vector4f(x: \(x), y: \(y), z: \(z), w: \(w))"
     }
+}
+
+public extension Vector4f {
+    
+    public static func +=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs = lhs + rhs
+    }
+    
+    public static func -=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs = lhs - rhs
+    }
+    
+    public static func *=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs = lhs * rhs
+    }
+    
+    public static func /=(lhs: inout Vector4f, rhs: Vector4f) {
+        lhs = lhs / rhs
+    }
+    
+    public static func *=(lhs: inout Vector4f, rhs: Float) {
+        lhs = lhs * rhs
+    }
+    
+    public static func /=(lhs: inout Vector4f, rhs: Float) {
+        lhs = lhs / rhs
+    }
+    
 }

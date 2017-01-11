@@ -4,6 +4,8 @@
 
 public typealias vec3 = Vector3f
 
+extension Vector3f : Vector { }
+
 public extension Vector3f {
     //MARK: - initializers
     
@@ -32,40 +34,36 @@ public extension Vector3f {
     public static let zero = Vector3f()
 }
 
-public extension Vector3f {
-    public var xy: Vector2f {
-        get {
-            return Vector2f(x, y)
-        }
-        set (v) {
-            x = v.x
-            y = v.y
-        }
-    }
-    
-    public var xz: Vector2f {
-        get {
-            return Vector2f(x, z)
-        }
-        set (v) {
-            x = v.x
-            z = v.y
-        }
-    }
-    
-    public var yz: Vector2f {
-        get {
-            return Vector2f(y, z)
-        }
-        set (v) {
-            y = v.x
-            z = v.y
-        }
-    }
-}
-
 extension Vector3f: CustomStringConvertible {
     public var description: String {
         return "Vector3f(x: \(x), y: \(y), z: \(z))"
     }
+}
+
+public extension Vector3f {
+    
+    public static func +=(lhs: inout Vector3f, rhs: Vector3f) {
+        lhs = lhs + rhs
+    }
+    
+    public static func -=(lhs: inout Vector3f, rhs: Vector3f) {
+        lhs = lhs - rhs
+    }
+    
+    public static func *=(lhs: inout Vector3f, rhs: Vector3f) {
+        lhs = lhs * rhs
+    }
+    
+    public static func /=(lhs: inout Vector3f, rhs: Vector3f) {
+        lhs = lhs / rhs
+    }
+    
+    public static func *=(lhs: inout Vector3f, rhs: Float) {
+        lhs = lhs * rhs
+    }
+    
+    public static func /=(lhs: inout Vector3f, rhs: Float) {
+        lhs = lhs / rhs
+    }
+    
 }

@@ -111,6 +111,14 @@ public extension Vector2f {
         return unsafeBitCast(lhs.d * rhs.d, to: Vector2f.self)
     }
     
+    public static func /(lhs: Vector2f, rhs: Float) -> Vector2f {
+        return unsafeBitCast(lhs.d * (1.0 / rhs), to: Vector2f.self)
+    }
+    
+    public static func /(lhs: Vector2f, rhs: Vector2f) -> Vector2f {
+        return unsafeBitCast(lhs.d / rhs.d, to: Vector2f.self)
+    }
+    
     public static func *(lhs: Matrix4x4f, rhs: Vector2f) -> Vector2f {
         let res = lhs.d * Vector4f(rhs).d
         return Vector2f(res.x, res.y)
@@ -119,10 +127,6 @@ public extension Vector2f {
     public static func *(lhs: Vector2f, rhs: Matrix4x4f) -> Vector2f {
         let res = Vector4f(lhs).d * rhs.d
         return Vector2f(res.x, res.y)
-    }
-    
-    public static func *=(lhs: inout Vector2f, rhs: Float) {
-        lhs.d *= rhs
     }
 }
 

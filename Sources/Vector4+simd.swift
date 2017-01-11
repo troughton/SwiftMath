@@ -87,7 +87,7 @@ public extension Vector4f {
     
     // MARK: - functions
     
-    public func dot(x: Vector4f) -> Float {
+    public func dot(_ x: Vector4f) -> Float {
         return simd.dot(self.d, x.d)
     }
     
@@ -127,6 +127,14 @@ public extension Vector4f {
         return unsafeBitCast(lhs.d * rhs.d, to: Vector4f.self)
     }
     
+    public static func /(lhs: Vector4f, rhs: Float) -> Vector4f {
+        return unsafeBitCast(lhs.d * (1.0 / rhs), to: Vector4f.self)
+    }
+    
+    public static func /(lhs: Vector4f, rhs: Vector4f) -> Vector4f {
+        return unsafeBitCast(lhs.d / rhs.d, to: Vector4f.self)
+    }
+    
     public static func *(lhs: Matrix4x4f, rhs: Vector4f) -> Vector4f {
         return unsafeBitCast(lhs.d * rhs.d, to: Vector4f.self)
     }
@@ -135,8 +143,8 @@ public extension Vector4f {
         return unsafeBitCast(lhs.d * rhs.d, to: Vector4f.self)
     }
     
-    public static func *=(lhs: inout Vector4f, rhs: Float) {
-        lhs.d *= rhs
+    public static func ==(lhs: Vector4f, rhs: Vector4f) -> Bool {
+        return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z && lhs.w == rhs.w
     }
 }
 

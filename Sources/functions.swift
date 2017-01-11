@@ -23,6 +23,21 @@ public func saturate<T:BinaryFloatingPoint>(_ x: T) -> T {
 /// - parameter t: interpolant
 ///
 /// - returns: a value interpolated from a to b
-public func interpolate<T:BinaryFloatingPoint>(a: T, b: T, t: T) -> T {
+public func interpolate<T:BinaryFloatingPoint>(_ a: T, to b: T, factor t: T) -> T {
     return a + (b - a) * t
+}
+
+/// Maps a value from a start range to an end range
+///
+/// - parameter value: the value to map, within the range startMin...startMax.
+/// - parameter startMin: the minimum value to map from
+/// - parameter startMax: the maximum value to map from
+/// - parameter endMin: the minimum value to map to
+/// - parameter endMax: the maximum value to map to
+///
+/// - returns: a value within the range endMin...endMax
+public func map<T: FloatingPoint>(_ value: T, start startMin: T, _ startMax: T, end endMin: T, _ endMax: T) -> T{
+    let startRange = startMax - startMin
+    let endRange = endMax - endMin
+    return ((value - startMin) / startRange) * endRange + endMin
 }

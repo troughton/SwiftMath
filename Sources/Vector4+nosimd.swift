@@ -92,7 +92,7 @@ extension Vector4f: Equatable {
         return self / sqrt(lengthSquared)
     }
     
-    public func interpolated(with v: Vector4f, by t: Float) -> Vector4f {
+    public func interpolated(to v: Vector4f, factor t: Float) -> Vector4f {
         return self + (v - self) * t
     }
     

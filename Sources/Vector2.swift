@@ -4,6 +4,8 @@
 
 public typealias vec2 = Vector2f
 
+extension Vector2f : Vector { }
+
 public extension Vector2f {
     //MARK: - initializers
     
@@ -39,3 +41,30 @@ extension Vector2f: CustomStringConvertible {
     }
 }
 
+public extension Vector2f {
+    
+    public static func +=(lhs: inout Vector2f, rhs: Vector2f) {
+        lhs = lhs + rhs
+    }
+    
+    public static func -=(lhs: inout Vector2f, rhs: Vector2f) {
+        lhs = lhs - rhs
+    }
+    
+    public static func *=(lhs: inout Vector2f, rhs: Vector2f) {
+        lhs = lhs * rhs
+    }
+    
+    public static func /=(lhs: inout Vector2f, rhs: Vector2f) {
+        lhs = lhs / rhs
+    }
+    
+    public static func *=(lhs: inout Vector2f, rhs: Float) {
+        lhs = lhs * rhs
+    }
+    
+    public static func /=(lhs: inout Vector2f, rhs: Float) {
+        lhs = lhs / rhs
+    }
+    
+}
