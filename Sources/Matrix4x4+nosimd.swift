@@ -82,10 +82,10 @@ public struct Matrix4x4f {
         
         set {
             switch col {
-            case 0: m11 = newValue[0]; m12 = newValue[1]; m12 = newValue[2]; m12 = newValue[3];
-            case 1: m21 = newValue[0]; m22 = newValue[1]; m22 = newValue[2]; m22 = newValue[3];
-            case 2: m31 = newValue[0]; m32 = newValue[1]; m32 = newValue[2]; m32 = newValue[3];
-            case 3: m41 = newValue[0]; m42 = newValue[1]; m42 = newValue[2]; m42 = newValue[3];
+            case 0: m11 = newValue[0]; m12 = newValue[1]; m13 = newValue[2]; m14 = newValue[3];
+            case 1: m21 = newValue[0]; m22 = newValue[1]; m23 = newValue[2]; m24 = newValue[3];
+            case 2: m31 = newValue[0]; m32 = newValue[1]; m33 = newValue[2]; m34 = newValue[3];
+            case 3: m41 = newValue[0]; m42 = newValue[1]; m43 = newValue[2]; m44 = newValue[3];
             default: fatalError("Index outside of bounds")
             }
         }
@@ -341,17 +341,17 @@ public extension Matrix4x4f {
 
 public extension Matrix4x4f {
     
-    /// Creates a new instance from the values provided in row-major order
+    /// Creates a new instance from the values provided in column-major order
     public init(
         _ m00: Float, _ m01: Float, _ m02: Float, _ m03: Float,
         _ m10: Float, _ m11: Float, _ m12: Float, _ m13: Float,
         _ m20: Float, _ m21: Float, _ m22: Float, _ m23: Float,
         _ m30: Float, _ m31: Float, _ m32: Float, _ m33: Float) {
         self.init(
-            vec4(m00, m10, m20, m30),
-            vec4(m01, m11, m21, m31),
-            vec4(m02, m12, m22, m32),
-            vec4(m03, m13, m23, m33)
+            vec4(m00, m01, m02, m03),
+            vec4(m10, m11, m12, m13),
+            vec4(m20, m21, m22, m23),
+            vec4(m30, m31, m32, m33)
         )
     }
     
