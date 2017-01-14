@@ -35,27 +35,31 @@ public struct Quaternion : Equatable {
     }
     
     public init(eulerAngles: Vector3f) {
+        let (roll, pitch, yaw) = (eulerAngles.x, eulerAngles.y, eulerAngles.z)
         
-        let cX = cos(eulerAngles.x * 0.5);
-        let cY = cos(eulerAngles.y * 0.5)
-        let cZ = cos(eulerAngles.z * 0.5)
+        let t0 = cos(yaw * 0.5);
+        let t1 = sin(yaw * 0.5);
+        let t2 = cos(roll * 0.5);
+        let t3 = sin(roll * 0.5);
+        let t4 = cos(pitch * 0.5);
+        let t5 = sin(pitch * 0.5);
         
-        let sX = sin(eulerAngles.x * 0.5)
-        let sY = sin(eulerAngles.y * 0.5)
-        let sZ = sin(eulerAngles.z * 0.5)
-        
-        
-        let w = cX * cY * cZ + sX * sY * sZ;
-        let x = sX * cY * cZ - cX * sY * sZ;
-        let y = cX * sY * cZ + sX * cY * sZ;
-        let z = cX * cY * sZ - sX * sY * cZ;
+        let w = t0 * t2 * t4 + t1 * t3 * t5;
+        let x = t0 * t3 * t4 - t1 * t2 * t5;
+        let y = t0 * t2 * t5 + t1 * t3 * t4;
+        let z = t1 * t2 * t4 - t0 * t3 * t5;
         
         self = Quaternion(x, y, z, w)
     }
     
     
     public var eulerAngles : Vector3f {
-        return Vector3f(self.pitch, self.yaw, self.roll);
+        get {
+            return Vector3f(self.roll, self.pitch, self.yaw)
+        }
+        set(newValue) {
+            self = Quaternion(eulerAngles: newValue)
+        }
     }
     
     public var roll : Float {

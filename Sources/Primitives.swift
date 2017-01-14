@@ -70,7 +70,7 @@ public struct Ray {
         self = viewRay
     }
     
-    func at(t: Float) -> Vector3f {
+    public func at(t: Float) -> Vector3f {
         return self.origin + Vector3f(t) * self.direction
     }
     
