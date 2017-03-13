@@ -26,6 +26,14 @@ public extension Vector3f {
     }
 }
 
+public func min(_ a: Vector3f, _ b: Vector3f) -> Vector3f {
+    return Vector3f(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z))
+}
+
+public func max(_ a: Vector3f, _ b: Vector3f) -> Vector3f {
+    return Vector3f(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z))
+}
+
 public extension Vector3f {
     public var isZero: Bool {
         return x == 0.0 && y == 0.0 && z == 0.0
