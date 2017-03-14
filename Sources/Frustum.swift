@@ -70,7 +70,7 @@ struct FrustumPlane {
 
 private let isGL = true
 
-struct Frustum {
+public struct Frustum {
     
     enum PlaneDirection {
         case far
@@ -102,7 +102,7 @@ struct Frustum {
     
     let planes : [PlaneDirection : FrustumPlane]
     
-    init(worldToCameraMatrix: Matrix4x4f, projectionMatrix: Matrix4x4f) {
+    public init(worldToCameraMatrix: Matrix4x4f, projectionMatrix: Matrix4x4f) {
         let vp = projectionMatrix * worldToCameraMatrix
         
         var planes = [PlaneDirection : FrustumPlane]()
@@ -147,7 +147,7 @@ struct Frustum {
         self.planes = planes
     }
     
-    func enclosesPoint(_ point: vec3) -> Bool {
+    public func enclosesPoint(_ point: vec3) -> Bool {
         for plane in planes.values {
             if plane.distanceTo(point) < 0 {
                 return false
@@ -156,7 +156,7 @@ struct Frustum {
         return true
     }
     
-    func containsBox(_ boundingBox: AxisAlignedBoundingBox) -> Bool {
+    public func containsBox(_ boundingBox: AxisAlignedBoundingBox) -> Bool {
         
         for (_, plane) in planes {
             var shouldContinue = false
@@ -172,7 +172,8 @@ struct Frustum {
         return true
     }
     
-    func containsSphere(centre: vec3, radius: Float) -> Bool {
+    public func containsSphere(centre: vec3, radius: Float) -> Bool {
+        
         for plane in planes.values {
             let distance = plane.distanceTo(centre)
             if distance <= -radius {

@@ -63,6 +63,13 @@ public struct Quaternion : Equatable {
     }
     
     public var roll : Float {
+        let factor1 = (self.x * self.y + self.w * self.z)
+        let factor2 = self.w * self.w + self.x * self.x - self.y * self.y - self.z * self.z
+        let result = atan2(2 * factor1, factor2);
+        return result
+    }
+    
+    public var pitch : Float {
         let factor1 = (self.y * self.z + self.w * self.x)
         var factor2 = self.w * self.w
         factor2 -= self.x * self.x - self.y * self.y
@@ -70,17 +77,10 @@ public struct Quaternion : Equatable {
         return atan2(2 * factor1, factor2);
     }
     
-    public var pitch : Float {
+    public var yaw : Float {
         let factor = (self.x * self.z - self.w * self.y)
         let clamped = clamp(-2 * factor, min: -1, max: 1)
         return asin(clamped);
-    }
-        
-    public var yaw : Float {
-        let factor1 = (self.x * self.y + self.w * self.z)
-        let factor2 = self.w * self.w + self.x * self.x - self.y * self.y - self.z * self.z
-        let result = atan2(2 * factor1, factor2);
-        return result
     }
     
     public static func *(q1: Quaternion, q2: Quaternion) -> Quaternion {
