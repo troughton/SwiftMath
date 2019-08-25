@@ -1,9 +1,13 @@
+// swift-tools-version:5.0
+
 import PackageDescription
 
 let package = Package(
-    name: "SwiftMath"
+    name: "SwiftMath",
+    products: [
+        .library(name: "SwiftMath", targets: ["SwiftMath"]),
+    ],
+    targets: [
+        .target(name: "SwiftMath")
+    ]
 )
-
-let ar = Product(name: "SwiftMath", type: .Library(.Static), modules: ["SwiftMath"])
-
-products.append(ar)
