@@ -17,7 +17,7 @@ extension Vector2f {
             let p = p2d(Float.random(in: -1...1), Float.random(in: -1...1))
             let lsq = p.lengthSquared
             if 0.1 < lsq && lsq < 1.0 {
-                return p * Float(1.0 / sqrt(lsq))
+                return p * Float(1.0 / lsq.squareRoot())
             }
         }
     }

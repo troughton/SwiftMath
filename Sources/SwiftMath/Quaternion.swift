@@ -255,7 +255,7 @@ public func normalize(_ x: Quaternion) -> Quaternion {
         return x * Float(2.0 / (1.0 + qmagsq));
     }
     else {
-        return x * (1.0 / sqrt(qmagsq));
+        return x * (1.0 / qmagsq.squareRoot());
     }
 }
 
@@ -276,7 +276,7 @@ public func slerp(from: Quaternion, to: Quaternion, factor t: Float) -> Quaterni
     
     // Calculate temporary values.
     let halfTheta : Float = acos(cosHalfTheta)
-    let sinHalfTheta : Float = sqrt(1.0 - cosHalfTheta * cosHalfTheta)
+    let sinHalfTheta : Float = (1.0 - cosHalfTheta * cosHalfTheta).squareRoot()
     
     var x : Float, y : Float, z : Float, w : Float;
     
@@ -351,7 +351,7 @@ extension Quaternion {
             n4 = self.z;
         }
         
-        n4 = sqrt(n4)
+        n4 = n4.squareRoot()
         
         self *= 0.5 / n4
     }
@@ -402,7 +402,7 @@ extension Quaternion {
             n4 = self.z;
         }
         
-        n4 = sqrt(n4)
+        n4 = n4.squareRoot()
         
         self *= 0.5 / n4
     }
@@ -453,7 +453,7 @@ extension Quaternion {
             n4 = self.z;
         }
         
-        n4 = sqrt(n4)
+        n4 = n4.squareRoot()
         
         self *= 0.5 / n4
     }
