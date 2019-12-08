@@ -10,6 +10,30 @@ import Swift
 import Real
 
 @frozen
+public struct Rect<Scalar: SIMDScalar & BinaryFloatingPoint & Comparable>: Hashable, Codable {
+    public var origin : SIMD2<Scalar>
+    public var size : SIMD2<Scalar>
+  
+    @inlinable
+    public init() {
+        self.origin = SIMD2<Scalar>()
+        self.size = SIMD2<Scalar>()
+    }
+    
+    @inlinable
+    public init(origin: SIMD2<Scalar>, size: SIMD2<Scalar>) {
+        self.origin = origin
+        self.size = size
+    }
+    
+    @inlinable
+    public func contains(point: SIMD2<Scalar>) -> Bool {
+        let maxPoint = self.origin + self.size
+        return all(point .>= self.origin) && all(point .<= maxPoint)
+    }
+}
+
+@frozen
 public struct AxisAlignedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & Comparable>: Hashable, Codable {
     public var minPoint : SIMD3<Scalar>
     public var maxPoint : SIMD3<Scalar>
