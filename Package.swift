@@ -11,6 +11,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-numerics", from: Version(0, 0, 3))
     ],
     targets: [
-        .target(name: "SwiftMath", dependencies: ["Real"])
+        .target(name: "SwiftMath", dependencies: ["Real"]),
+        .testTarget(name: "SwiftMathTests", dependencies: ["SwiftMath", "Real"]),
     ]
 )

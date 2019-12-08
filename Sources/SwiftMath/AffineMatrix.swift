@@ -86,6 +86,29 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
     }
     
     @inlinable
+    public subscript(row row: Int) -> SIMD4<Scalar> {
+        get {
+            switch row {
+            case 0: return self.r0
+            case 1: return self.r1
+            case 2: return self.r2
+            case 3: return SIMD4(0, 0, 0, 1)
+            default: preconditionFailure("Index outside of bounds")
+            }
+        }
+        
+        set {
+            switch row {
+            case 0: self.r0 = newValue
+            case 1: self.r1 = newValue
+            case 2: self.r2 = newValue
+            case 3: assert(newValue == SIMD4(0, 0, 0, 1))
+            default: preconditionFailure("Index outside of bounds")
+            }
+        }
+    }
+    
+    @inlinable
     public subscript(row: Int, col: Int) -> Scalar {
         get {
             switch row {
@@ -199,6 +222,7 @@ extension AffineMatrix {
         var result = SIMD3(lhs.r0.x, lhs.r1.x, lhs.r2.x) * SIMD3(repeating: rhs.x)
         result.addProduct(SIMD3(lhs.r0.y, lhs.r1.y, lhs.r2.y), SIMD3(repeating: rhs.y))
         result.addProduct(SIMD3(lhs.r0.z, lhs.r1.z, lhs.r2.z), SIMD3(repeating: rhs.z))
+        result.addProduct(SIMD3(lhs.r0.w, lhs.r1.w, lhs.r2.w), SIMD3(repeating: rhs.w))
         return SIMD4(result, rhs.w)
     }
 }

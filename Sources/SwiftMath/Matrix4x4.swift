@@ -160,13 +160,14 @@ extension Matrix4x4 {
     @inlinable
     public static func *(lhs: Matrix4x4, rhs: Matrix4x4) -> Matrix4x4 {
         let rhsT = rhs.transpose
+        
         let lhsSelectionVector : SIMD16<UInt32> = SIMD16(0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3)
         let rhsSelectionVector : SIMD16<UInt32> = SIMD16(0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3)
         
         var columns = lhs.c0[lhsSelectionVector] * rhsT.c0[rhsSelectionVector]
-        columns.addProduct(lhs.c1[lhsSelectionVector], rhs.c1[rhsSelectionVector])
-        columns.addProduct(lhs.c2[lhsSelectionVector], rhs.c2[rhsSelectionVector])
-        columns.addProduct(lhs.c3[lhsSelectionVector], rhs.c3[rhsSelectionVector])
+        columns.addProduct(lhs.c1[lhsSelectionVector], rhsT.c1[rhsSelectionVector])
+        columns.addProduct(lhs.c2[lhsSelectionVector], rhsT.c2[rhsSelectionVector])
+        columns.addProduct(lhs.c3[lhsSelectionVector], rhsT.c3[rhsSelectionVector])
         
         return Matrix4x4(columns[SIMD4(0, 1, 2, 3)],
                          columns[SIMD4(4, 5, 6, 7)],
@@ -179,6 +180,7 @@ extension Matrix4x4 {
         var result = lhs.c0 * SIMD4<Scalar>(repeating: rhs.x)
         result.addProduct(lhs.c1, SIMD4<Scalar>(repeating: rhs.y))
         result.addProduct(lhs.c2, SIMD4<Scalar>(repeating: rhs.z))
+        result.addProduct(lhs.c3, SIMD4<Scalar>(repeating: rhs.w))
         return result
     }
     
