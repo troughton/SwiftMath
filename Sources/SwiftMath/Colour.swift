@@ -51,7 +51,7 @@ public struct RGBColour : Equatable {
             case 2:
                 return self.b
             default:
-                fatalError("Index out of bounds")
+                preconditionFailure("Index out of bounds")
             }
         }
         set {
@@ -63,7 +63,7 @@ public struct RGBColour : Equatable {
             case 2:
                 self.b = newValue
             default:
-                fatalError("Index out of bounds")
+                preconditionFailure("Index out of bounds")
             }
         }
     }
@@ -164,7 +164,7 @@ public struct RGBAColour : Equatable, Hashable {
             case 3:
                 return self.a
             default:
-                fatalError("Index out of bounds")
+                preconditionFailure("Index out of bounds")
             }
         }
         set {
@@ -178,7 +178,7 @@ public struct RGBAColour : Equatable, Hashable {
             case 3:
                 self.a = newValue
             default:
-                fatalError("Index out of bounds")
+                preconditionFailure("Index out of bounds")
             }
         }
     }

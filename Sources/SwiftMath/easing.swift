@@ -6,7 +6,7 @@
 //
 //
 
-import Foundation
+import Real
 
 // MARK: Linear
 public func linear(_ time: Float) -> Float {
@@ -15,15 +15,15 @@ public func linear(_ time: Float) -> Float {
 
 // MARK: Sine Ease
 public func sineEaseIn(_ time: Float) -> Float {
-    return -cos(time * Angle.pi_2) + 1
+    return -Float.cos(time * Float.pi * 0.5) + 1
 }
 
 public func sineEaseOut(_ time: Float) -> Float {
-    return sin(time * Angle.pi_2)
+    return Float.sin(time *  Float.pi * 0.5)
 }
 
 public func sineEaseInOut(_ time: Float) -> Float {
-    return -0.5 * (cos(Angle.pi * time) - 1)
+    return -0.5 * (Float.cos(Float.pi * time) - 1)
 }
 
 // MARK: Quad Ease
@@ -107,21 +107,21 @@ public func quintEaseInOut(_ time: Float) -> Float {
 
 // MARK: Expo Ease
 public func expoEaseIn(_ time: Float) -> Float {
-    return time == 0 ? 0 : powf(2, 10 * (time / 1 - 1)) - 1 * 0.001
+    return time == 0 ? 0 : .pow(2, 10 * (time / 1 - 1)) - 1 * 0.001
 }
 
 public func expoEaseOut(_ time: Float) -> Float {
-    return time == 1 ? 1 : (-powf(2, -10 * time / 1) + 1)
+    return time == 1 ? 1 : (-.pow(2, -10 * time / 1) + 1)
 }
 
 public func expoEaseInOut(_ time: Float) -> Float {
     var time = time
     time /= 0.5
     if time < 1 {
-        time = 0.5 * powf(2, 10 * (time - 1))
+        time = 0.5 * .pow(2, 10 * (time - 1))
     }
     else {
-        time = 0.5 * (-powf(2, -10 * (time - 1)) + 2)
+        time = 0.5 * (-.pow(2, -10 * (time - 1)) + 2)
     }
     return time
 }
@@ -157,7 +157,7 @@ public func elasticEaseIn(_ time: Float, period: Float) -> Float {
     else {
         let s: Float = period / 4
         time = time - 1
-        newT = -powf(2, 10 * time) * sin((time - s) * Angle.pi2 / period)
+        newT = -.pow(2, 10 * time) * .sin((time - s) * 2 * Float.pi / period)
     }
     return newT
 }
@@ -169,7 +169,7 @@ public func elasticEaseOut(_ time: Float, period: Float) -> Float {
     }
     else {
         let s: Float = period / 4
-        newT = powf(2, -10 * time) * sin((time - s) * Angle.pi2 / period) + 1
+        newT = .pow(2, -10 * time) * .sin((time - s) * 2 * Float.pi / period) + 1
     }
     return newT
 }
@@ -189,10 +189,10 @@ public func elasticEaseInOut(_ time: Float, period: Float) -> Float {
         let s: Float = period / 4
         time = time - 1
         if time < 0 {
-            newT = -0.5 * powf(2, 10 * time) * sin((time - s) * Angle.pi2 / period)
+            newT = -0.5 * .pow(2, 10 * time) * .sin((time - s) * 2 * Float.pi / period)
         }
         else {
-            newT = powf(2, -10 * time) * sin((time - s) * Angle.pi2 / period) * 0.5 + 1
+            newT = .pow(2, -10 * time) * .sin((time - s) * 2 * Float.pi / period) * 0.5 + 1
         }
     }
     return newT
@@ -280,26 +280,26 @@ public func customEase(_ time: Float, easingParam: [Float]) -> Float {
 }
 
 public func easeIn(_ time: Float, rate: Float) -> Float {
-    return powf(time, rate)
+    return .pow(time, rate)
 }
 
 public func easeOut(_ time: Float, rate: Float) -> Float {
-    return powf(time, 1 / rate)
+    return .pow(time, 1 / rate)
 }
 
 public func easeInOut(_ time: Float, rate: Float) -> Float {
     var time = time
     time *= 2
     if time < 1 {
-        return 0.5 * powf(time, rate)
+        return 0.5 * .pow(time, rate)
     }
     else {
-        return (1.0 - 0.5 * powf(2 - time, rate))
+        return (1.0 - 0.5 * .pow(2 - time, rate))
     }
 }
 
 public func quadraticIn(_ time: Float) -> Float {
-    return powf(time, 2)
+    return time * time
 }
 
 public func quadraticOut(_ time: Float) -> Float {

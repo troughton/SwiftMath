@@ -3,11 +3,11 @@
 //  
 //
 
-typealias PackedVector3f = PackedVector3<Float>
+typealias PackedSIMD3<Scalar> = PackedVector3<Float>
 typealias PackedVector3d = PackedVector3<Double>
 
 @frozen
-public struct PackedVector3<Scalar : SIMDScalar> : Hashable, Codable {
+public struct PackedVector3<Scalar: SIMDScalar>: Hashable, Codable {
     public var x: Scalar
     public var y: Scalar
     public var z: Scalar
@@ -50,7 +50,7 @@ extension SIMD4 {
     }
 }
 
-extension SIMD3 {
+extension PackedVector3 {
     @inlinable public var xy:SIMD2<Scalar> { get { return SIMD2<Scalar>(x,y) } set { x = newValue.x; y = newValue.y } }
     @inlinable public var xyz:SIMD3<Scalar> { get { return SIMD3<Scalar>(x,y,z) } set { x = newValue.x; y = newValue.y; z = newValue.z } }
     @inlinable public var xz:SIMD2<Scalar> { get { return SIMD2<Scalar>(x,z) } set { x = newValue.x; z = newValue.y } }

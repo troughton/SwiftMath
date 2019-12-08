@@ -85,20 +85,20 @@ public struct SIMDMatrix {
 
 @inlinable
 public func *(v: SIMDVector4f, m: SIMDMatrix) -> SIMDVector4f {
-    var x = v.x * m.x.x;     x = v.y * m.x.y + x;    x = v.z * m.x.z + x;    x = v.w * m.x.w + x;
-    var y = v.x * m.y.x;     y = v.y * m.y.y + y;    y = v.z * m.y.z + y;    y = v.w * m.y.w + y;
-    var z = v.x * m.z.x;     z = v.y * m.z.y + z;    z = v.z * m.z.z + z;    z = v.w * m.z.w + z;
-    var w = v.x * m.w.x;     w = v.y * m.w.y + w;    w = v.z * m.w.z + w;    w = v.w * m.w.w + w;
+    var x: SIMD4<Float> = v.x * m.x.x;     x = v.y * m.x.y + x;    x = v.z * m.x.z + x;    x = v.w * m.x.w + x;
+    var y: SIMD4<Float> = v.x * m.y.x;     y = v.y * m.y.y + y;    y = v.z * m.y.z + y;    y = v.w * m.y.w + y;
+    var z: SIMD4<Float> = v.x * m.z.x;     z = v.y * m.z.y + z;    z = v.z * m.z.z + z;    z = v.w * m.z.w + z;
+    var w: SIMD4<Float> = v.x * m.w.x;     w = v.y * m.w.y + w;    w = v.z * m.w.z + w;    w = v.w * m.w.w + w;
     let res = SIMDVector4f(x: x, y: y, z: z, w: w)
     return res;
 }
 
 @inlinable
 public func *(m: SIMDMatrix, v: SIMDVector4f) -> SIMDVector4f {
-    var x = v.x * m.x.x;     x += v.y * m.y.x;    x += v.z * m.z.x;    x += v.w * m.w.x;
-    var y = v.x * m.x.y;     y += v.y * m.y.y;    y += v.z * m.z.y;    y += v.w * m.w.y;
-    var z = v.x * m.x.z;     z += v.y * m.y.z;    z += v.z * m.z.z;    z += v.w * m.w.z;
-    var w = v.x * m.x.w;     w += v.y * m.y.w;    w += v.z * m.z.w;    w += v.w * m.w.w;
+    var x: SIMD4<Float> = v.x * m.x.x;     x += v.y * m.y.x;    x += v.z * m.z.x;    x += v.w * m.w.x;
+    var y: SIMD4<Float> = v.x * m.x.y;     y += v.y * m.y.y;    y += v.z * m.z.y;    y += v.w * m.w.y;
+    var z: SIMD4<Float> = v.x * m.x.z;     z += v.y * m.y.z;    z += v.z * m.z.z;    z += v.w * m.w.z;
+    var w: SIMD4<Float> = v.x * m.x.w;     w += v.y * m.y.w;    w += v.z * m.z.w;    w += v.w * m.w.w;
     let res = SIMDVector4f(x: x, y: y, z: z, w: w)
     return res;
 }

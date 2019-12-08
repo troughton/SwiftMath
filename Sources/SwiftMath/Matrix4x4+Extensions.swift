@@ -6,25 +6,25 @@
 //
 //
 
-extension Matrix4x4f {
+extension Matrix4x4 {
     @inlinable
-    public func translated(by v: Vector3f) -> Matrix4x4f {
-        let col3 = self * Vector4f(v, 1)
-        return Matrix4x4f(
-            self[0],
-            self[1],
-            self[2],
+    public func translated(by v: SIMD3<Scalar>) -> Matrix4x4 {
+        let col3 : SIMD4<Scalar> = self * SIMD4<Scalar>(v, 1)
+        return Matrix4x4(
+            self.c0,
+            self.c1,
+            self.c2,
             col3
         )
     }
     
     @inlinable
-    public func withTranslation(_ v: Vector3f) -> Matrix4x4f {
-        let col3 = Vector4f(v, 1)
-        return Matrix4x4f(
-            self[0],
-            self[1],
-            self[2],
+    public func withTranslation(_ v: SIMD3<Scalar>) -> Matrix4x4 {
+        let col3 = SIMD4<Scalar>(v, 1)
+        return Matrix4x4(
+            self.c0,
+            self.c1,
+            self.c2,
             col3
         )
     }
@@ -37,28 +37,26 @@ extension Matrix4x4f {
     /// - remark:
     ///
     ///     ```
-    ///     var r = self × Vector4f(v)
+    ///     var r = self × SIMD4<Scalar>(v)
     ///     r *= 1.0/r.w
-    ///     return Vector3f(r.x, r.y, r.z)
+    ///     return SIMD3<Scalar>(r.x, r.y, r.z)
     ///     ```
     ///
     /// - returns: 
     /// A new vector created by first multiplying the matrix by the
     /// vector and then performing perspective division on the result vector.
     @inlinable
-    public func multiplyAndProject(_ v: Vector3f) -> Vector3f {
-        var r = self * Vector4f(v, 1)
-        r *= 1.0/r.w
-        return Vector3f(r.x, r.y, r.z)
+    public func multiplyAndProject(_ v: SIMD3<Scalar>) -> SIMD3<Scalar> {
+        var r : SIMD4<Scalar> = self * SIMD4<Scalar>(v, 1)
+        r *= SIMD4(repeating: 1.0 / r.w)
+        return SIMD3<Scalar>(r.x, r.y, r.z)
     }
 }
 
-
-
 extension AffineMatrix {
     @inlinable
-    public func translated(by v: Vector3f) -> AffineMatrix {
-        let col3 = self * Vector4f(v, 1)
+    public func translated(by v: SIMD3<Scalar>) -> AffineMatrix {
+        let col3 = self * SIMD4<Scalar>(v, 1)
         
         var result = self
         result.r0.w = col3.x
@@ -69,7 +67,7 @@ extension AffineMatrix {
     }
     
     @inlinable
-    public func withTranslation(_ v: Vector3f) -> AffineMatrix {
+    public func withTranslation(_ v: SIMD3<Scalar>) -> AffineMatrix {
         var result = self
         result.r0.w = v.x
         result.r1.w = v.y

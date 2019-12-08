@@ -8,6 +8,10 @@
 
 import Swift
 
+public typealias Vector2f = SIMD2<Float>
+public typealias Vector3f = SIMD3<Float>
+public typealias Vector4f = SIMD4<Float>
+
 @inlinable
 public func dot<V : SIMD>(_ a: V, _ b: V) -> V.Scalar where V.Scalar : FloatingPoint {
     var total = V.Scalar(0)
@@ -63,12 +67,20 @@ public func normalize<V : SIMD>(_ v: V) -> V where V.Scalar : FloatingPoint {
 
 @inlinable
 public func cross<S>(_ u: SIMD2<S>, _ v: SIMD2<S>) -> S where S : Numeric {
-    return u.x * v.y - u.y * v.x
+    var result = u.x * v.y
+    result -= u.y * v.x
+    return result
 }
 
 @inlinable
 public func cross<S>(_ u: SIMD3<S>, _ v: SIMD3<S>) -> SIMD3<S> where S : Numeric {
-    return SIMD3<S>(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x)
+    var x : S = u.y * v.z
+    x -= u.z * v.y
+    var y : S = u.z * v.x
+    y -= u.x * v.z
+    var z = u.x * v.y
+    z -= u.y * v.x
+    return SIMD3<S>(x, y, z)
 }
 
 @inlinable
@@ -104,24 +116,6 @@ public func abs<V : SIMD>(_ v: V) -> V where V.Scalar : Comparable & SignedNumer
 }
 
 @inlinable
-public func min<V : SIMD>(_ a: V, _ b: V) -> V where V.Scalar : Comparable {
-    var result = a
-    for i in a.indices {
-        result[i] = min(a[i], b[i])
-    }
-    return result
-}
-
-@inlinable
-public func max<V : SIMD>(_ a: V, _ b: V) -> V where V.Scalar : Comparable {
-    var result = a
-    for i in a.indices {
-        result[i] = max(a[i], b[i])
-    }
-    return result
-}
-
-@inlinable
 public func clamp<V : SIMD>(_ x: V, min minVec: V, max maxVec: V) -> V where V.Scalar : Comparable {
-    return min(max(minVec, x), maxVec)
+    return x.clamped(lowerBound: minVec, upperBound: maxVec)
 }

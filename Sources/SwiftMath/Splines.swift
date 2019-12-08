@@ -6,44 +6,48 @@
 //  Copyright © 2017 troughton. All rights reserved.
 //
 
-import Foundation
+import Real
 
+@frozen
 public struct CubicPolynomial<T: SIMD> where T.Scalar == Float {
-    private var _length : Float! = nil
-    public var length : Float {
-        return _length
-    }
+    public var length : Float = 0.0
     
     public let a : T
     public let b : T
     public let c : T
     public let d : T
     
+    @inlinable
     public init(_ a: T, _ b: T, _ c: T, _ d: T) {
         self.a = a
         self.b = b
         self.c = c
         self.d = d
-        self._length = self.calculateLength()
+        self.length = self.calculateLength()
     }
     
+    @inlinable
     public init(pointA: T, tangentA: T, pointB: T, tangentB: T) {
         let c0 = pointA
         let c1 = tangentA
         
-        var c2 = -3 * pointA + 3 * pointB
-        c2 += -2 * tangentA - tangentB
-        var c3 = (2 * pointA)
+        var c2 : T = -3 * pointA
+        c2 += 3 * pointB
+        c2 += -2 * tangentA
+        c2 -= tangentB
+        var c3 : T = 2 * pointA
         c3 -= (2 * pointB)
         c3 += tangentA + tangentB
         
         self.init(c3, c2, c1, c0)
     }
     
+    @inlinable
     public init(uniformPoints p0: T, _ p1: T, _ p2: T, _ p3: T) {
         self.init(p0, p2, 0.5 * (p2 - p0), 0.5 * (p3 - p1))
     }
     
+    @inlinable
     public init(nonUniformWithP0 p0: T, p1: T, p2: T, p3: T, dt0: Float, dt1: Float, dt2: Float) {
         var t1 = (p1 - p0) / dt0
         t1 -= (p2 - p0) / (dt0 + dt1)
@@ -56,10 +60,11 @@ public struct CubicPolynomial<T: SIMD> where T.Scalar == Float {
         self.init(pointA: p1, tangentA: t1 * dt1, pointB: p2, tangentB: t2 * dt2)
     }
     
+    @inlinable
     public init(centripetalCatmullRomWithPoints p0: T, _ p1: T, _ p2: T, _ p3: T) {
-        var dt0 = pow((p1 - p0).lengthSquared, 0.25)
-        var dt1 = pow((p2 - p1).lengthSquared, 0.25)
-        var dt2 = pow((p3 - p2).lengthSquared, 0.25)
+        var dt0 = T.Scalar.pow((p1 - p0).lengthSquared, 0.25)
+        var dt1 = T.Scalar.pow((p2 - p1).lengthSquared, 0.25)
+        var dt2 = T.Scalar.pow((p3 - p2).lengthSquared, 0.25)
         
         if dt1 < 1e-4 {
             dt1 = 1.0
@@ -76,7 +81,8 @@ public struct CubicPolynomial<T: SIMD> where T.Scalar == Float {
         self.init(nonUniformWithP0: p0, p1: p1, p2: p2, p3: p3, dt0: dt0, dt1: dt1, dt2: dt2)
     }
     
-    private func calculateLength(iterations: Int = 100) -> Float {
+    @usableFromInline
+    func calculateLength(iterations: Int = 100) -> Float {
         let stride = 1.0 / Float(iterations)
         
         var total = 0.0 as Float
@@ -93,6 +99,7 @@ public struct CubicPolynomial<T: SIMD> where T.Scalar == Float {
         return total
     }
     
+    @inlinable
     public func evaluate(at t: Float) -> T {
         let t2 = t * t
         let t3 = t * t2
@@ -103,6 +110,7 @@ public struct CubicPolynomial<T: SIMD> where T.Scalar == Float {
         return result
     }
     
+    @inlinable
     public func evaluateDerivative(at t: Float) -> T {
         let t2 = t * t
         var result = c
@@ -111,13 +119,16 @@ public struct CubicPolynomial<T: SIMD> where T.Scalar == Float {
         return result
     }
     
+    @inlinable
     public func estimateInverse(`for` value: Float, component: Int) -> Float {
         let minVal = self.evaluate(at: 0)[component]
         let maxVal = self.evaluate(at: 1)[component]
         
-        var estimatedT = (value - minVal) / (maxVal - minVal)
+        var estimatedT = value - minVal
+        estimatedT /= maxVal - minVal
+        
         for _ in 0..<5 {
-            estimatedT = estimatedT - self.evaluate(at: estimatedT)[component]/self.evaluateDerivative(at: estimatedT)[component]
+            estimatedT -= self.evaluate(at: estimatedT)[component] / self.evaluateDerivative(at: estimatedT)[component]
         }
         return estimatedT
     }
@@ -127,6 +138,7 @@ public struct CatmullRomSpline<T: SIMD> where T.Scalar == Float {
     public let polynomials : [CubicPolynomial<T>]
     public let length : Float
     
+    @inlinable
     public init(points: [T]) {
         assert(points.count > 1)
         
@@ -163,15 +175,18 @@ public struct CatmullRomSpline<T: SIMD> where T.Scalar == Float {
         self.length = length
     }
     
+    @inlinable
     public func evaluate(at t: Float) -> T {
         return self.evaluate(at: t, derivative: false)
     }
     
+    @inlinable
     public func evaluateDerivative(at t: Float) -> T {
         return self.evaluate(at: t, derivative: true)
     }
     
-    private func evaluate(at t: Float, derivative: Bool) -> T {
+    @inlinable
+    func evaluate(at t: Float, derivative: Bool) -> T {
         let polyIndexAndT = self.polynomialIndexAndT(at: t)
         let index = polyIndexAndT.0
         let polyT = polyIndexAndT.1
@@ -185,6 +200,7 @@ public struct CatmullRomSpline<T: SIMD> where T.Scalar == Float {
         }
     }
     
+    @inlinable
     public func polynomialIndexAndT(at t: Float) -> (Int, Float) {
         let length = self.length * t
 
@@ -208,6 +224,7 @@ public struct CatmullRomSpline<T: SIMD> where T.Scalar == Float {
         return (index, polyT)
     }
     
+    @inlinable
     public func estimateValue(`for` value: Float, component: Int) -> T {
         let divisions = 200
         let step = 1.0 / Float(divisions)

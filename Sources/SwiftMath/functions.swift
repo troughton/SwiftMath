@@ -63,7 +63,7 @@ public func saturate<T:BinaryFloatingPoint>(_ x: T) -> T {
 /// - returns: a value interpolated from a to b
 @inlinable
 public func interpolate<T:BinaryFloatingPoint>(from a: T, to b: T, factor t: T) -> T {
-    return a + (b - a) * t
+    return a + ((b - a) as T) * t
 }
 
 /// Maps a value from a start range to an end range

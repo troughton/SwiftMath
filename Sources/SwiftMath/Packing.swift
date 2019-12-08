@@ -117,7 +117,7 @@ public enum Packing {
         let w2 = clamp(z, min: 0, max: 1) * Float(UInt8.max)
         let w3 = clamp(w, min: 0, max: 1) * Float(UInt8.max)
         
-        return (UInt32(w3) << 24) | (UInt32(w2) << 16) | (UInt32(w1) << 8) | UInt32(w0)
+        return (UInt32(w3) &<< 24) | (UInt32(w2) &<< 16) | (UInt32(w1) &<< 8) | UInt32(w0)
     }
     
     @inlinable
@@ -138,7 +138,7 @@ public enum Packing {
     
     @inlinable
     public static func packIntsToUInt32(_ x: UInt8, _ y: UInt8, _ z: UInt8, _ w: UInt8) -> UInt32 {
-        return (UInt32(w) << 24) | (UInt32(z) << 16) | (UInt32(y) << 8) | UInt32(x)
+        return (UInt32(w) &<< 24) | (UInt32(z) &<< 16) | (UInt32(y) &<< 8) | UInt32(x)
     }
     
     
@@ -146,7 +146,7 @@ public enum Packing {
     public static func packFloatToUInt32(_ x: Float, _ y: Float) -> UInt32 {
         let x = Float16(x).bitPattern
         let y = Float16(y).bitPattern
-        return UInt32(x) | (UInt32(y) << 16)
+        return UInt32(x) | (UInt32(y) &<< 16)
     }
 }
 

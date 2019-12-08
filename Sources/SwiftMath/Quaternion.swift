@@ -6,20 +6,18 @@
 //
 //
 
-import Foundation
+import Real
 
-public typealias quat = Quaternion
-
-public struct Quaternion : Equatable {
-    public static let identity = Quaternion(0, 0, 0, 1)
+public struct Quaternion<Scalar : SIMDScalar & BinaryFloatingPoint & Real>: Hashable {
+    public static var identity : Quaternion { return Quaternion(0, 0, 0, 1) }
     
-    public var x: Float
-    public var y: Float
-    public var z: Float
-    public var w: Float
+    public var x: Scalar
+    public var y: Scalar
+    public var z: Scalar
+    public var w: Scalar
     
     @inlinable
-    public init(_ x: Float, _ y: Float, _ z: Float, _ w: Float) {
+    public init(_ x: Scalar, _ y: Scalar, _ z: Scalar, _ w: Scalar) {
         self.x = x
         self.y = y
         self.z = z
@@ -27,53 +25,75 @@ public struct Quaternion : Equatable {
     }
     
     @inlinable
-    public init(angle: Angle, axis: Vector3f) {
+    public init(angle: Angle<Scalar>, axis: SIMD3<Scalar>) {
         let halfAngle = -angle.radians * 0.5
         
-        let scale = sin(halfAngle)
-        let w = cos(halfAngle)
+        let scale = Scalar.sin(halfAngle)
+        let w = Scalar.cos(halfAngle)
         
         self = Quaternion(scale * axis.x, scale * axis.y, scale * axis.z, w)
     }
     
     @inlinable
-    public init(eulerAngles: Vector3f) {
+    public init(eulerAngles: SIMD3<Scalar>) {
         let (heading, altitude, bank) = (eulerAngles.y, eulerAngles.z, eulerAngles.x)
         
-        let c1 = cos(heading * 0.5);
-        let c2 = cos(altitude * 0.5);
-        let c3 = cos(bank * 0.5);
-        let s1 = sin(heading * 0.5);
-        let s2 = sin(altitude * 0.5);
-        let s3 = sin(bank * 0.5);
+        let c1 = Scalar.cos(heading * 0.5);
+        let c2 = Scalar.cos(altitude * 0.5);
+        let c3 = Scalar.cos(bank * 0.5);
+        let s1 = Scalar.sin(heading * 0.5);
+        let s2 = Scalar.sin(altitude * 0.5);
+        let s3 = Scalar.sin(bank * 0.5);
         
-        let w = c1 * c2 * c3 - s1 * s2 * s3
-        let x = s1 * s2 * c3 + c1 * c2 * s3
-        let y = s1 * c2 * c3 + c1 * s2 * s3
-        let z = c1 * s2 * c3 - s1 * c2 * s3
+        var w : Scalar = c1 * c2 * c3
+        w -= s1 * s2 * s3
+        var x : Scalar = s1 * s2 * c3
+        x += c1 * c2 * s3
+        var y : Scalar = s1 * c2 * c3
+        y += c1 * s2 * s3
+        var z : Scalar = c1 * s2 * c3
+        z -= s1 * c2 * s3
         
         self = Quaternion(x, y, z, w)
     }
     
     
     @inlinable
-    public var eulerAngles : Vector3f {
+    public var eulerAngles : SIMD3<Scalar> {
         get {
-            let qx2 = self.x * self.x
-            let qy2 = self.y * self.y
-            let qz2 = self.z * self.z
-            let test = self.x * self.y + self.z * self.w
+            let qx2 : Scalar = self.x * self.x
+            let qy2 : Scalar = self.y * self.y
+            let qz2 : Scalar = self.z * self.z
+            var test : Scalar = self.x * self.y
+            test += self.z * self.w
             if (test > 0.499) {
-                return Vector3f(0, 2.0 * atan2(self.x, self.w), Float.pi * 0.5)
+                return SIMD3<Scalar>(0, 2.0 * Scalar.atan2(y: self.x, x: self.w), Scalar.pi * 0.5)
             }
             if (test < -0.499) {
-                return Vector3f(0, -2.0 * atan2(self.x, self.w), Float.pi * -0.5)
+                return SIMD3<Scalar>(0, -2.0 * Scalar.atan2(y: self.x, x: self.w), Scalar.pi * -0.5)
             }
-            let h = atan2(2 * self.y * self.w - 2 * self.x * self.z, 1 - 2 * qy2 - 2 * qz2)
-            let a = asin(2 * self.x * self.y + 2 * self.z * self.w)
-            let b = atan2(2 * self.x * self.w - 2 * self.y * self.z, 1 - 2 * qx2 - 2 * qz2)
+            var hY : Scalar = 2 * self.y * self.w
+            hY -= 2 * self.x * self.z
             
-            return Vector3f(b, h, a)
+            var hX : Scalar = 1
+            hX -= 2 * qy2
+            hX -= 2 * qz2
+            
+            var sinA : Scalar = 2 * self.x * self.y
+            sinA += 2 * self.z * self.w
+            
+            var bY : Scalar = 2 * self.x * self.w
+            bY -= 2 * self.y * self.z
+            
+            var bX : Scalar = 1
+            bX -= 2 * qx2
+            bX -= 2 * qz2
+            
+            let h = Scalar.atan2(y: hY, x: hX)
+            let a = Scalar.asin(sinA)
+            let b = Scalar.atan2(y: bY, x: bX)
+            
+            return SIMD3<Scalar>(b, h, a)
         }
         set(newValue) {
             self = Quaternion(eulerAngles: newValue)
@@ -81,36 +101,43 @@ public struct Quaternion : Equatable {
     }
     
     @inlinable
-    public var roll : Float {
-        let factor1 = (self.x * self.y + self.w * self.z)
-        let factor2 = self.w * self.w + self.x * self.x - self.y * self.y - self.z * self.z
-        let result = atan2(2 * factor1, factor2);
+    public var roll : Scalar {
+        var factor1 : Scalar = self.x * self.y
+        factor1 += self.w * self.z
+        
+        var factor2 : Scalar = self.w * self.w
+        factor2 += self.x * self.x
+        factor2 -= self.y * self.y
+        factor2 -= self.z * self.z
+        let result = Scalar.atan2(y: 2 * factor1, x: factor2);
         return result
     }
     
     @inlinable
-    public var pitch : Float {
-        let factor1 = (self.y * self.z + self.w * self.x)
-        var factor2 = self.w * self.w
+    public var pitch : Scalar {
+        var factor1 : Scalar = self.y * self.z
+        factor1 += self.w * self.x
+        var factor2 : Scalar = self.w * self.w
         factor2 -= self.x * self.x - self.y * self.y
         factor2 += self.z * self.z
-        return atan2(2 * factor1, factor2);
+        return Scalar.atan2(y: 2 * factor1, x: factor2);
     }
     
     @inlinable
-    public var yaw : Float {
-        let factor = (self.x * self.z - self.w * self.y)
+    public var yaw : Scalar {
+        var factor = self.x * self.z
+        factor -= self.w * self.y
         let clamped = clamp(-2 * factor, min: -1, max: 1)
-        return asin(clamped);
+        return Scalar.asin(clamped);
     }
     
     @inlinable
     public static func *(q1: Quaternion, q2: Quaternion) -> Quaternion {
-        let x =  q1.x * q2.w + q1.y * q2.z - q1.z * q2.y + q1.w * q2.x
-        let y = -q1.x * q2.z + q1.y * q2.w + q1.z * q2.x + q1.w * q2.y
-        let z =  q1.x * q2.y - q1.y * q2.x + q1.z * q2.w + q1.w * q2.z
-        let w = -q1.x * q2.x - q1.y * q2.y - q1.z * q2.z + q1.w * q2.w
-        return Quaternion(x, y, z, w)
+        var result = SIMD4<Scalar>(q1.x, -q1.x, q1.x, -q1.x) * SIMD4<Scalar>(q2.w, q2.z, q2.y, q2.x)
+        result.addProduct(SIMD4(q1.y, q1.y, -q1.y, -q1.y), SIMD4<Scalar>(q2.z, q2.w, q2.x, q2.y))
+        result.addProduct(SIMD4(-q1.z, q1.z, q1.z, -q1.z), SIMD4<Scalar>(q2.y, q2.x, q2.w, q2.z))
+        result.addProduct(SIMD4(repeating: q1.w), SIMD4<Scalar>(q2.x, q2.y, q2.z, q2.w))
+        return Quaternion(result.x, result.y, result.z, result.w)
     }
     
     @inlinable
@@ -119,12 +146,12 @@ public struct Quaternion : Equatable {
     }
     
     @inlinable
-    public static func *(lhs: Quaternion, rhs: Float) -> Quaternion {
+    public static func *(lhs: Quaternion, rhs: Scalar) -> Quaternion {
         return Quaternion(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.w * rhs)
     }
     
     @inlinable
-    public static func *=(lhs: inout Quaternion, rhs: Float) {
+    public static func *=(lhs: inout Quaternion, rhs: Scalar) {
         lhs.x *= rhs
         lhs.y *= rhs
         lhs.z *= rhs
@@ -142,7 +169,7 @@ public struct Quaternion : Equatable {
     }
     
     @inlinable
-    public var lengthSquared : Float {
+    public var lengthSquared : Scalar {
         return dot(self, self)
     }
     
@@ -159,31 +186,11 @@ public struct Quaternion : Equatable {
     }
 }
 
-extension Matrix4x4f {
+extension Matrix4x4 where Scalar : Real {
     
-    /// Creates a new instance from the values provided in column-major order
-    public init(
-        _ m00: Float, _ m01: Float, _ m02: Float, _ m03: Float,
-        _ m10: Float, _ m11: Float, _ m12: Float, _ m13: Float,
-        _ m20: Float, _ m21: Float, _ m22: Float, _ m23: Float,
-        _ m30: Float, _ m31: Float, _ m32: Float, _ m33: Float) {
-        self.init(
-            Vector4f(m00, m01, m02, m03),
-            Vector4f(m10, m11, m12, m13),
-            Vector4f(m20, m21, m22, m23),
-            Vector4f(m30, m31, m32, m33)
-        )
-    }
-    
-    public init(_ array: [Float]) {
-        self = Matrix4x4f()
-        for (i, val) in array.enumerated() {
-            self[i / 4][i % 4] = val
-        }
-    }
-    
-    public init(quaternion q: Quaternion) {
-        self = Matrix4x4f.identity
+    @inlinable
+    public init(quaternion q: Quaternion<Scalar>) {
+        self = Matrix4x4<Scalar>.identity
         
         let sqw = q.w*q.w
         let sqx = q.x*q.x
@@ -198,76 +205,75 @@ extension Matrix4x4f {
         
         var tmp1 = q.x*q.y
         var tmp2 = q.z*q.w
-        self[0, 1] = 2.0 * (tmp1 + tmp2)*invs
-        self[1, 0] = 2.0 * (tmp1 - tmp2)*invs
+        self[1, 0] = 2.0 * (tmp1 + tmp2)*invs
+        self[0, 1] = 2.0 * (tmp1 - tmp2)*invs
         
         tmp1 = q.x*q.z
         tmp2 = q.y*q.w
-        self[0, 2] = 2.0 * (tmp1 - tmp2)*invs
-        self[2, 0] = 2.0 * (tmp1 + tmp2)*invs
+        self[2, 0] = 2.0 * (tmp1 - tmp2)*invs
+        self[0, 2] = 2.0 * (tmp1 + tmp2)*invs
         tmp1 = q.y*q.z
         tmp2 = q.x*q.w
-        self[1, 2] = 2.0 * (tmp1 + tmp2)*invs
-        self[2, 1] = 2.0 * (tmp1 - tmp2)*invs
+        self[2, 1] = 2.0 * (tmp1 + tmp2)*invs
+        self[1, 2] = 2.0 * (tmp1 - tmp2)*invs
     }
 }
 
 extension Quaternion {
     
     @inlinable
-    public static func *(lhs: Matrix4x4f, rhs: Quaternion) -> Matrix4x4f {
-        return lhs * Matrix4x4f(quaternion: rhs)
+    public static func *(lhs: Matrix4x4<Scalar>, rhs: Quaternion) -> Matrix4x4<Scalar> {
+        return lhs * Matrix4x4<Scalar>(quaternion: rhs)
     }
     
     @inlinable
-    public static func *(lhs: Quaternion, rhs: Matrix4x4f) -> Matrix4x4f {
-        return Matrix4x4f(quaternion: lhs) * rhs
+    public static func *(lhs: Quaternion, rhs: Matrix4x4<Scalar>) -> Matrix4x4<Scalar> {
+        return Matrix4x4<Scalar>(quaternion: lhs) * rhs
     }
     
     @inlinable
-    public static func *(lhs: Matrix3x3f, rhs: Quaternion) -> Matrix3x3f {
-        return lhs * Matrix3x3f(quaternion: rhs)
+    public static func *(lhs: Matrix3x3<Scalar>, rhs: Quaternion) -> Matrix3x3<Scalar> {
+        return lhs * Matrix3x3<Scalar>(quaternion: rhs)
     }
     
     @inlinable
-    public static func *(lhs: Quaternion, rhs: Matrix3x3f) -> Matrix3x3f {
-        return Matrix3x3f(quaternion: lhs) * rhs
+    public static func *(lhs: Quaternion, rhs: Matrix3x3<Scalar>) -> Matrix3x3<Scalar> {
+        return Matrix3x3<Scalar>(quaternion: lhs) * rhs
     }
     
     @inlinable
-    public static func *(lhs: AffineMatrix, rhs: Quaternion) -> AffineMatrix {
+    public static func *(lhs: AffineMatrix<Scalar>, rhs: Quaternion) -> AffineMatrix<Scalar> {
         return lhs * AffineMatrix(quaternion: rhs)
     }
     
     @inlinable
-    public static func *(lhs: Quaternion, rhs: AffineMatrix) -> AffineMatrix {
+    public static func *(lhs: Quaternion, rhs: AffineMatrix<Scalar>) -> AffineMatrix<Scalar> {
         return AffineMatrix(quaternion: lhs) * rhs
     }
     
 }
 
 @inlinable
-public func normalize(_ x: Quaternion) -> Quaternion {
+public func normalize<Scalar>(_ x: Quaternion<Scalar>) -> Quaternion<Scalar> {
     //http://stackoverflow.com/questions/11667783/quaternion-and-normalization
-    let qmagsq = Float(x.x * x.x + x.y * x.y + x.z * x.z + x.w * x.w)
+    let qmagsq = dot(x, x)
     
-    if (abs(1.0 - qmagsq) < 2.107342e-08) {
-        return x * Float(2.0 / (1.0 + qmagsq));
-    }
-    else {
-        return x * (1.0 / qmagsq.squareRoot());
-    }
+    return x * (1.0 / qmagsq.squareRoot())
 }
 
 @inlinable
-public func dot(_ u: Quaternion, _ v: Quaternion) -> Float {
-    return u.x * v.x + u.y * v.y + u.z * v.z + u.w * v.w
+public func dot<Scalar>(_ u: Quaternion<Scalar>, _ v: Quaternion<Scalar>) -> Scalar {
+    let x : Scalar = u.x * v.x
+    let y : Scalar = u.y * v.y
+    let z : Scalar = u.z * v.z
+    let w : Scalar = u.w * v.w
+    return x + y + z + w
 }
 
 @inlinable
-public func slerp(from: Quaternion, to: Quaternion, factor t: Float) -> Quaternion {
+public func slerp<Scalar>(from: Quaternion<Scalar>, to: Quaternion<Scalar>, factor t: Scalar) -> Quaternion<Scalar> {
     // Calculate angle between them.
-    let cosHalfTheta = dot(from, to)
+    let cosHalfTheta : Scalar = dot(from, to)
     
     // if this == other or this == -other then theta = 0 and we can return this
     if (abs(cosHalfTheta) >= 1.0) {
@@ -275,28 +281,28 @@ public func slerp(from: Quaternion, to: Quaternion, factor t: Float) -> Quaterni
     }
     
     // Calculate temporary values.
-    let halfTheta : Float = acos(cosHalfTheta)
-    let sinHalfTheta : Float = (1.0 - cosHalfTheta * cosHalfTheta).squareRoot()
+    let halfTheta : Scalar = Scalar.acos(cosHalfTheta)
+    let sinHalfTheta : Scalar = (1.0 - cosHalfTheta * cosHalfTheta).squareRoot()
     
-    var x : Float, y : Float, z : Float, w : Float;
+    var x : Scalar, y : Scalar, z : Scalar, w : Scalar
     
     // if theta = 180 degrees then result is not fully defined
     // we could rotate around any axis normal to qa or qb
     if (abs(sinHalfTheta) < 0.001){
-        w = (from.w * 0.5 + to.w * 0.5);
-        x = (from.x * 0.5 + to.x * 0.5);
-        y = (from.y * 0.5 + to.y * 0.5);
-        z = (from.z * 0.5 + to.z * 0.5);
+        w = (from.w * 0.5 + to.w * 0.5)
+        x = (from.x * 0.5 + to.x * 0.5)
+        y = (from.y * 0.5 + to.y * 0.5)
+        z = (from.z * 0.5 + to.z * 0.5)
     } else {
         
-        let ratioA = sin((1 - t) * halfTheta) / sinHalfTheta
-        let ratioB = sin(t * halfTheta) / sinHalfTheta
+        let ratioA = Scalar.sin((1 - t) * halfTheta) / sinHalfTheta
+        let ratioB = Scalar.sin(t * halfTheta) / sinHalfTheta
         
         //calculate quaternion.
-        w = (from.w * ratioA + to.w * ratioB);
-        x = (from.x * ratioA + to.x * ratioB);
-        y = (from.y * ratioA + to.y * ratioB);
-        z = (from.z * ratioA + to.z * ratioB);
+        w = (from.w * ratioA + to.w * ratioB)
+        x = (from.x * ratioA + to.x * ratioB)
+        y = (from.y * ratioA + to.y * ratioB)
+        z = (from.z * ratioA + to.z * ratioB)
     }
     return Quaternion(x, y, z, w);
 }
@@ -305,8 +311,9 @@ public func slerp(from: Quaternion, to: Quaternion, factor t: Float) -> Quaterni
 ///MARK: Quaternion extensions
 
 extension Quaternion {
-    public init(_ m: Matrix4x4f) {
-        var n4 : Float; // the norm of quaternion multiplied by 4
+    @inlinable
+    public init(_ m: Matrix4x4<Scalar>) {
+        var n4 : Scalar; // the norm of quaternion multiplied by 4
         var tr = m[0][0]
         tr += m[1][1]
         tr += m[2][2]; // trace of matrix
@@ -356,8 +363,9 @@ extension Quaternion {
         self *= 0.5 / n4
     }
     
-    public init(_ m: Matrix3x3f) {
-        var n4 : Float; // the norm of quaternion multiplied by 4
+    @inlinable
+    public init(_ m: Matrix3x3<Scalar>) {
+        var n4 : Scalar; // the norm of quaternion multiplied by 4
         var tr = m[0][0]
         tr += m[1][1]
         tr += m[2][2]; // trace of matrix
@@ -407,8 +415,9 @@ extension Quaternion {
         self *= 0.5 / n4
     }
     
-    public init(_ m: AffineMatrix) {
-        var n4 : Float; // the norm of quaternion multiplied by 4
+    @inlinable
+    public init(_ m: AffineMatrix<Scalar>) {
+        var n4 : Scalar; // the norm of quaternion multiplied by 4
         var tr = m[0][0]
         tr += m[1][1]
         tr += m[2][2]; // trace of matrix
@@ -459,3 +468,26 @@ extension Quaternion {
     }
 }
 
+
+extension Quaternion : Codable {
+    
+    @inlinable
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(self.x)
+        try container.encode(self.y)
+        try container.encode(self.z)
+        try container.encode(self.w)
+    }
+    
+    @inlinable
+    public init(from decoder: Decoder) throws {
+        var values = try decoder.unkeyedContainer()
+        let x = try values.decode(Scalar.self)
+        let y = try values.decode(Scalar.self)
+        let z = try values.decode(Scalar.self)
+        let w = try values.decode(Scalar.self)
+        
+        self.init(x, y, z, w)
+    }
+}

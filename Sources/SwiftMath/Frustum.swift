@@ -26,23 +26,33 @@ public enum Extent : Int {
     static let values = (0..<Extent.lastElement.rawValue).map { rawValue -> Extent in return Extent(rawValue: rawValue)! }
 }
 
-public struct SIMDPlane {
-    public let normalX : Vector4f
-    public let normalY : Vector4f
-    public let normalZ : Vector4f
-    public let d : Vector4f
-}
-
-public struct FrustumPlane {
-    public let storage : Vector4f
+@frozen
+public struct SIMDPlane<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, Codable {
+    public let normalX : SIMD4<Scalar>
+    public let normalY : SIMD4<Scalar>
+    public let normalZ : SIMD4<Scalar>
+    public let d : SIMD4<Scalar>
     
     @inlinable
-    public var normalVector : Vector3f {
-        return storage.xyz
+    public init(normalX: Scalar, normalY: Scalar, normalZ: Scalar, constant: Scalar) {
+        self.normalX = SIMD4(repeating: normalX)
+        self.normalY = SIMD4(repeating: normalY)
+        self.normalZ = SIMD4(repeating: normalZ)
+        self.d = SIMD4(repeating: constant)
+    }
+}
+
+@frozen
+public struct FrustumPlane<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, Codable {
+    public let storage : SIMD4<Scalar>
+    
+    @inlinable
+    public var normalVector : SIMD3<Scalar> {
+        return storage[SIMD3(0, 1, 2)]
     }
     
     @inlinable
-    public var constant : Float {
+    public var constant : Scalar {
         return storage.w
     }
     
@@ -54,21 +64,23 @@ public struct FrustumPlane {
     }
     
     @inlinable
-    public func distance(to point: Vector3f) -> Float {
+    public func distance(to point: SIMD3<Scalar>) -> Scalar {
         return dot(self.normalVector, point) + self.constant
     }
     
     @inlinable
-    public init(normalVector: Vector3f, constant: Float) {
+    public init(normalVector: SIMD3<Scalar>, constant: Scalar) {
         let magnitude = normalVector.length
-        self.init(normalAndConstant: Vector4f(normalVector, constant) / magnitude)
+        self.init(normalAndConstant: SIMD4<Scalar>(normalVector, constant) / magnitude)
     }
     
-    public init(normalAndConstant: Vector4f) {
+    @inlinable
+    public init(normalAndConstant: SIMD4<Scalar>) {
         self.storage = normalAndConstant
     }
     
-    public init(withPoints points: [Vector3f]) {
+    @inlinable
+    public init(withPoints points: [SIMD3<Scalar>]) {
         assert(points.count > 2)
         
         let normal = normalize(cross(points[1] - points[0], points[2] - points[0]))
@@ -86,14 +98,15 @@ public struct FrustumPlane {
         }(), "All the points must lie on the resultant plane")
     }
     
-    public var simdPlane : SIMDPlane {
-        return SIMDPlane(normalX: Vector4f(repeating: self.normalVector.x), normalY: Vector4f(repeating: self.normalVector.y), normalZ: Vector4f(repeating: self.normalVector.z), d: Vector4f(repeating: self.constant))
+    @inlinable
+    public var simdPlane : SIMDPlane<Scalar> {
+        return SIMDPlane(normalX: self.normalVector.x, normalY: self.normalVector.y, normalZ: self.normalVector.z, constant: self.constant)
     }
 }
 
 private let isGL = false
 
-public struct Frustum {
+public struct Frustum<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, Codable {
     enum PlaneDirection {
         case far
         case near
@@ -119,17 +132,17 @@ public struct Frustum {
             }
         }
         
-        static let frustumPlanes : [PlaneDirection] = [.near, .far, .left, .right, .top, .bottom]
+        static var frustumPlanes : [PlaneDirection] { return [.near, .far, .left, .right, .top, .bottom] }
     }
     
-    public let leftPlane : FrustumPlane
-    public let rightPlane : FrustumPlane
-    public let topPlane : FrustumPlane
-    public let bottomPlane : FrustumPlane
-    public let nearPlane : FrustumPlane
-    public let farPlane : FrustumPlane
+    public let leftPlane : FrustumPlane<Scalar>
+    public let rightPlane : FrustumPlane<Scalar>
+    public let topPlane : FrustumPlane<Scalar>
+    public let bottomPlane : FrustumPlane<Scalar>
+    public let nearPlane : FrustumPlane<Scalar>
+    public let farPlane : FrustumPlane<Scalar>
     
-    public init(worldToProjectionMatrix: Matrix4x4f) {
+    public init(worldToProjectionMatrix: Matrix4x4<Scalar>) {
         // FIXME: These planes are complete guesses (as to which is near, far, left, right etc.
         // Thankfully, nothing relies on that currently.
         
@@ -138,44 +151,44 @@ public struct Frustum {
         let n1x = (vp[0][3] + vp[0][0])
         let n1y = (vp[1][3] + vp[1][0])
         let n1z = (vp[2][3] + vp[2][0])
-        let n1 = Vector3f(n1x, n1y, n1z)
+        let n1 = SIMD3<Scalar>(n1x, n1y, n1z)
         self.leftPlane = FrustumPlane(normalVector: n1, constant: (vp[3][3] + vp[3][0]))
         
         let n2x = (vp[0][3] - vp[0][0])
         let n2y = (vp[1][3] - vp[1][0])
         let n2z = (vp[2][3] - vp[2][0])
-        self.rightPlane = FrustumPlane(normalVector: Vector3f(n2x, n2y, n2z), constant: (vp[3][3] - vp[3][0]))
+        self.rightPlane = FrustumPlane(normalVector: SIMD3<Scalar>(n2x, n2y, n2z), constant: (vp[3][3] - vp[3][0]))
         
         let n3x = (vp[0][3] - vp[0][0])
         let n3y = (vp[1][3] - vp[1][0])
         let n3z = (vp[2][3] - vp[2][0])
         
-        self.topPlane = FrustumPlane(normalVector: Vector3f(n3x, n3y, n3z), constant: (vp[3][3] - vp[3][0]))
+        self.topPlane = FrustumPlane(normalVector: SIMD3<Scalar>(n3x, n3y, n3z), constant: (vp[3][3] - vp[3][0]))
         
         let n4x = (vp[0][3] + vp[0][1])
         let n4y = (vp[1][3] + vp[1][1])
         let n4z = (vp[2][3] + vp[2][1])
-        self.bottomPlane = FrustumPlane(normalVector: Vector3f(n4x, n4y, n4z), constant: (vp[3][3] + vp[3][1]))
+        self.bottomPlane = FrustumPlane(normalVector: SIMD3<Scalar>(n4x, n4y, n4z), constant: (vp[3][3] + vp[3][1]))
         
         let n5xGL = (vp[0][3] + vp[0][2])
         let n5yGL = (vp[1][3] + vp[1][2])
         let n5zGL = (vp[2][3] + vp[2][2])
         
         if isGL {
-            self.nearPlane = FrustumPlane(normalVector: Vector3f(n5xGL, n5yGL, n5zGL), constant: (vp[3][3] + vp[3][2]))
+            self.nearPlane = FrustumPlane(normalVector: SIMD3<Scalar>(n5xGL, n5yGL, n5zGL), constant: (vp[3][3] + vp[3][2]))
         } else {
-            self.nearPlane = FrustumPlane(normalVector: Vector3f(vp[0][2], vp[1][2], vp[2][2]), constant: vp[3][2])
+            self.nearPlane = FrustumPlane(normalVector: SIMD3<Scalar>(vp[0][2], vp[1][2], vp[2][2]), constant: vp[3][2])
         }
         
         let n6x = (vp[0][3] - vp[0][2])
         let n6y = (vp[1][3] - vp[1][2])
         let n6z = (vp[2][3] - vp[2][2])
-        self.farPlane = FrustumPlane(normalVector: Vector3f(n6x, n6y, n6z), constant: (vp[3][3] - vp[3][2]))
+        self.farPlane = FrustumPlane(normalVector: SIMD3<Scalar>(n6x, n6y, n6z), constant: (vp[3][3] - vp[3][2]))
         
     }
     
     @inlinable
-    public func enclosesPoint(_ point: Vector3f) -> Bool {
+    public func enclosesPoint(_ point: SIMD3<Scalar>) -> Bool {
         if topPlane.distance(to: point) < 0 { return false }
         if bottomPlane.distance(to: point) < 0 { return false }
         if nearPlane.distance(to: point) < 0 { return false }
@@ -187,11 +200,11 @@ public struct Frustum {
     }
     
     @inlinable
-    public var planes : UnsafePointer<FrustumPlane> {
-        mutating get {
-            assert(MemoryLayout<Frustum>.size == 6 * MemoryLayout<FrustumPlane>.size)
-            return withUnsafePointer(to: &self) { frustum in
-                return UnsafeRawPointer(frustum).assumingMemoryBound(to: FrustumPlane.self)
+    public func withPlanes<T>(_ perform: (UnsafePointer<FrustumPlane<Scalar>>) -> T) -> T {
+        assert(MemoryLayout<Frustum>.size == 6 * MemoryLayout<FrustumPlane<Scalar>>.size)
+        return withUnsafePointer(to: self) { frustum in
+            return frustum.withMemoryRebound(to: FrustumPlane<Scalar>.self, capacity: 6) {
+                perform($0)
             }
         }
     }
@@ -199,29 +212,29 @@ public struct Frustum {
     // Adapted from http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm
     // May have false positives.
     @inlinable
-    public func contains(box: AxisAlignedBoundingBox) -> Bool {
+    public func contains(box: AxisAlignedBoundingBox<Scalar>) -> Bool {
         // check box outside/inside of frustum
-        var frustum = self
-        let planes = frustum.planes
-        for i in 0..<6 {
-            var out = 0
-            out += (planes[i].distance(to: Vector3f(box.minX, box.minY, box.minZ)) < 0) ? 1 : 0
-            out += (planes[i].distance(to: Vector3f(box.maxX, box.minY, box.minZ)) < 0) ? 1 : 0
-            out += (planes[i].distance(to: Vector3f(box.minX, box.maxY, box.minZ)) < 0) ? 1 : 0
-            out += (planes[i].distance(to: Vector3f(box.maxX, box.maxY, box.minZ)) < 0) ? 1 : 0
-            out += (planes[i].distance(to: Vector3f(box.minX, box.minY, box.maxZ)) < 0) ? 1 : 0
-            out += (planes[i].distance(to: Vector3f(box.maxX, box.minY, box.maxZ)) < 0) ? 1 : 0
-            out += (planes[i].distance(to: Vector3f(box.minX, box.maxY, box.maxZ)) < 0) ? 1 : 0
-            out += (planes[i].distance(to: Vector3f(box.maxX, box.maxY, box.maxZ)) < 0) ? 1 : 0
+        return self.withPlanes { planes in
+            for i in 0..<6 {
+                var out = 0
+                out += (planes[i].distance(to: SIMD3<Scalar>(box.minX, box.minY, box.minZ)) < 0) ? 1 : 0
+                out += (planes[i].distance(to: SIMD3<Scalar>(box.maxX, box.minY, box.minZ)) < 0) ? 1 : 0
+                out += (planes[i].distance(to: SIMD3<Scalar>(box.minX, box.maxY, box.minZ)) < 0) ? 1 : 0
+                out += (planes[i].distance(to: SIMD3<Scalar>(box.maxX, box.maxY, box.minZ)) < 0) ? 1 : 0
+                out += (planes[i].distance(to: SIMD3<Scalar>(box.minX, box.minY, box.maxZ)) < 0) ? 1 : 0
+                out += (planes[i].distance(to: SIMD3<Scalar>(box.maxX, box.minY, box.maxZ)) < 0) ? 1 : 0
+                out += (planes[i].distance(to: SIMD3<Scalar>(box.minX, box.maxY, box.maxZ)) < 0) ? 1 : 0
+                out += (planes[i].distance(to: SIMD3<Scalar>(box.maxX, box.maxY, box.maxZ)) < 0) ? 1 : 0
+                
+                if out == 8 { return false }
+            }
             
-            if out == 8 { return false }
+            return true
         }
-        
-        return true
     }
     
     @inlinable
-    public func contains(sphere: Sphere) -> Bool {
+    public func contains(sphere: Sphere<Scalar>) -> Bool {
         if topPlane.distance(to: sphere.centre) < -sphere.radius { return false }
         if bottomPlane.distance(to: sphere.centre) < -sphere.radius { return false }
         if nearPlane.distance(to: sphere.centre) < -sphere.radius { return false }
@@ -233,7 +246,7 @@ public struct Frustum {
     }
     
     @inlinable
-    public var simdPlanes : (SIMDPlane, SIMDPlane, SIMDPlane, SIMDPlane, SIMDPlane, SIMDPlane) {
+    public var simdPlanes : (SIMDPlane<Scalar>, SIMDPlane<Scalar>, SIMDPlane<Scalar>, SIMDPlane<Scalar>, SIMDPlane<Scalar>, SIMDPlane<Scalar>) {
         return (farPlane.simdPlane, nearPlane.simdPlane, topPlane.simdPlane, bottomPlane.simdPlane, leftPlane.simdPlane, rightPlane.simdPlane)
     }
     

@@ -4,37 +4,153 @@
 
 import Swift
 
-extension Matrix2x2f {
-    public init(_ m: Matrix3x3f) {
-        self.init(m[0].xy, m[1].xy)
+/// A column-major 2x2 matrix.
+@frozen
+public struct Matrix2x2<Scalar: SIMDScalar & BinaryFloatingPoint> : Hashable, Codable {
+    public var columns: SIMD4<Scalar> = .init(1, 0, 0, 1)
+  
+    @inlinable
+    public init() {}
+    
+    /// Creates an instance using the vector to initialize the diagonal elements
+    @inlinable
+    public init(diagonal v: SIMD2<Scalar>) {
+        self.columns = SIMD4(v.x, 0, 0, v.y)
     }
     
-    public init(_ m: Matrix4x4f) {
+    /// Creates an instance with the specified columns
+    ///
+    /// - parameter c0: a vector representing column 0
+    /// - parameter c1: a vector representing column 1
+    /// - parameter c2: a vector representing column 2
+    @inlinable
+    public init(_ c0: SIMD2<Scalar>, _ c1: SIMD2<Scalar>) {
+        self.columns = SIMD4(lowHalf: c0, highHalf: c1)
+    }
+    
+    /// Creates a matrix with the elements in order c0.x, c0.y, c1.x, c1.y
+    @inlinable
+    public init(_ columns: SIMD4<Scalar>) {
+        self.columns = columns
+    }
+    
+    /// Access the `col`th column vector
+    @inlinable
+    public subscript(col: Int) -> SIMD2<Scalar> {
+        get {
+            switch col {
+            case 0: return self.columns.xy
+            case 1: return self.columns.zw
+            default: preconditionFailure("Index outside of bounds")
+            }
+        }
+        
+        set {
+            switch col {
+            case 0: self.columns.xy = newValue
+            case 1: self.columns.zw = newValue
+            default: preconditionFailure("Index outside of bounds")
+            }
+        }
+    }
+    
+    /// Access the `col`th column vector and then `row`th element
+    @inlinable
+    public subscript(row: Int, col: Int) -> Scalar {
+        get {
+            return self[col][row]
+        }
+        set {
+            self[col][row] = newValue
+        }
+    }
+    
+    @inlinable
+    public var transpose: Matrix2x2 {
+        return Matrix2x2(self.columns[SIMD4(0, 2, 1, 3)])
+    }
+    
+    @inlinable
+    public static prefix func -(m: Matrix2x2) -> Matrix2x2 {
+        return Matrix2x2(
+            -m.columns
+        )
+    }
+    
+    @inlinable
+    public static func *(lhs: Matrix2x2, rhs: Matrix2x2) -> Matrix2x2 {
+        var result = lhs.columns * rhs.columns[SIMD4(0, 0, 3, 3)]
+        result.addProduct(lhs.columns[SIMD4(2, 3, 0, 1)], rhs.columns[SIMD4(1, 1, 2, 2)])
+        return Matrix2x2(result)
+    }
+
+    // 2x2 column major Matrix adjugate multiply (A#)*B
+    @inlinable
+    public static func mul_AAdj_B(_ lhs: Matrix2x2, _ rhs: Matrix2x2) -> Matrix2x2 {
+        var result = lhs.columns[SIMD4(3, 0, 3, 0)] * rhs.columns
+        result -= lhs.columns[SIMD4(2, 1, 2, 1)] * rhs.columns[SIMD4(1, 0, 3, 2)]
+        return Matrix2x2(result)
+    }
+    
+    // 2x2 column major Matrix adjugate multiply A*(B#)
+    @inlinable
+    public static func mul_A_BAdj(_ lhs: Matrix2x2, _ rhs: Matrix2x2) -> Matrix2x2 {
+        var result = lhs.columns * rhs.columns[SIMD4(3, 3, 0, 0)]
+        result -= lhs.columns[SIMD4(2, 3, 0, 1)] * rhs.columns[SIMD4(1, 1, 2, 2)]
+        return Matrix2x2(result)
+    }
+    
+    @inlinable
+    public static func *(lhs: Matrix2x2, rhs: Scalar) -> Matrix2x2 {
+        return Matrix2x2(
+            lhs.columns * rhs
+        )
+    }
+    
+    @inlinable
+    public static func *(lhs: Matrix2x2, rhs: SIMD2<Scalar>) -> SIMD2<Scalar> {
+        var result = lhs.columns.xy * SIMD2(repeating: rhs.x)
+        result.addProduct(lhs.columns.zw, SIMD2(repeating: rhs.y))
+        return result
+    }
+    
+    @inlinable
+    public static func *(lhs: SIMD2<Scalar>, rhs: Matrix2x2) -> SIMD2<Scalar> {
+        var result = rhs.columns[SIMD2(0, 2)] * SIMD2(repeating: lhs.x)
+        result.addProduct(rhs.columns[SIMD2(1, 3)], SIMD2(repeating: lhs.y))
+        return result
+    }
+    
+}
+
+extension Matrix2x2 {
+    /// Returns the identity matrix
+    @inlinable
+    public static var identity : Matrix2x2 { return Matrix2x2(diagonal: SIMD2(repeating: 1.0)) }
+    
+    @inlinable
+    public init(_ m: Matrix3x3<Scalar>) {
+        self.init(m[0].xy, m[1].xy)
+    }
+    @inlinable
+    public init(_ m: Matrix4x4<Scalar>) {
         self.init(m[0].xy, m[1].xy)
     }
 }
 
-extension Matrix2x2f: CustomStringConvertible {
+extension Matrix2x2: CustomStringConvertible {
     
     /// Displays the matrix in column-major order
     public var description: String {
-        return "Matrix2x2f(\n\(self[0]), \(self[1]))\n)"
-    }
-}
-
-
-extension Matrix2x2f : CustomDebugStringConvertible {
-    public var debugDescription : String {
-        return self.description
+        return "Matrix2x2(\n\(self[0]), \(self[1]))\n)"
     }
 }
 
 @inlinable
-public func interpolate(from m1: Matrix2x2f, to m: Matrix2x2f, factor t: Float) -> Matrix2x2f {
-    return Matrix2x2f(
-        m1[1, 1] + (m[1, 1] - m1[1, 1]) * t,
-        m1[1, 2] + (m[1, 2] - m1[1, 2]) * t,
-        m1[2, 1] + (m[2, 1] - m1[2, 1]) * t,
-        m1[2, 2] + (m[2, 2] - m1[2, 2]) * t
+public func interpolate<Scalar>(from m1: Matrix2x2<Scalar>, to m2: Matrix2x2<Scalar>, factor t: Scalar) -> Matrix2x2<Scalar> {
+    return Matrix2x2(
+        m1.columns + (m2.columns - m1.columns) * t
     )
 }
+
+public typealias Matrix2x2f = Matrix2x2<Float>

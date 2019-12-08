@@ -2,38 +2,55 @@
 // License: https://github.com/SwiftGFX/SwiftMath#license-bsd-2-clause
 //
 
+import Real
+
 /// A floating point value that represents an angle
-public struct Angle : Codable, Hashable {
+@frozen
+public struct Angle<Scalar: BinaryFloatingPoint & Real> : Hashable {
 	
     /// The value of the angle in degrees
-    public var degrees: Float {
-        return radians * 180.0 / Float.pi
+    @inlinable
+    public var degrees: Scalar {
+        return radians * 180.0 / .pi
     }
 	
     /// The value of the angle in radians
-    public let radians: Float
+    public let radians: Scalar
 
 	/// Creates an instance using the value in radians
-    public init(radians val: Float) {
+    @inlinable
+    public init(radians val: Scalar) {
         radians = val
     }
 	
 	/// Creates an instance using the value in degrees
-    public init(degrees val: Float) {
-        radians = val / 180.0 * Float.pi
+    @inlinable
+    public init(degrees val: Scalar) {
+        radians = val / 180.0 * .pi
     }
     
     // MARK: Constants
-    public static let zero  = 0
-    public static let pi_6  = 30°
-    public static let pi_4  = 45°
-    public static let pi_3  = 60°
-    public static let pi_2  = Float.pi * 0.5
-    public static let pi2_3 = 120°
-    public static let pi    = Float.pi
-    public static let pi3_2 = 270°
-    public static let pi2   = Float.pi * 2
+    @inlinable public static var zero  : Angle { return  Angle(radians: 0) }
+    @inlinable public static var pi_6  : Angle { return  Angle(degrees: 30) }
+    @inlinable public static var pi_4  : Angle { return  Angle(degrees: 45) }
+    @inlinable public static var pi_3  : Angle { return  Angle(degrees: 60) }
+    @inlinable public static var pi_2  : Angle { return  Angle(radians: Scalar.pi * 0.5) }
+    @inlinable public static var pi2_3 : Angle { return  Angle(degrees: 120) }
+    @inlinable public static var pi    : Angle { return  Angle(radians: Scalar.pi) }
+    @inlinable public static var pi3_2 : Angle { return  Angle(degrees: 270) }
+    @inlinable public static var pi2   : Angle { return  Angle(radians: Scalar.pi * 2) }
 }
+
+extension Angle : Codable where Scalar : Codable {}
+
+@inlinable
+public func sincos<Scalar>(_ a: Angle<Scalar>) -> (sin: Scalar, cos: Scalar) {
+    let s: Scalar = Scalar.sin(a.radians)
+    let c: Scalar = Scalar.cos(a.radians)
+    
+    return (sin: s, cos: c)
+}
+
 
 extension Angle: CustomStringConvertible, CustomDebugStringConvertible {
     public var description: String {
@@ -45,42 +62,35 @@ extension Angle: CustomStringConvertible, CustomDebugStringConvertible {
     }
 }
 
-extension Int {
-    /// Returns the integer value as an angle in degrees
-    public var degrees: Angle {
-        return Angle(degrees: Float(self))
-    }
-}
-
 extension Angle {
     // MARK: - operators
     
     // MARK: multiplication (scaling)
   
     @inlinable
-    public static func *=(lhs: inout Angle, rhs: Float) {
+    public static func *=(lhs: inout Angle, rhs: Scalar) {
         lhs = Angle(radians: lhs.radians * rhs)
     }
     
     @inlinable
-    public static func *(lhs: Angle, rhs: Float) -> Angle {
+    public static func *(lhs: Angle, rhs: Scalar) -> Angle {
         return Angle(radians: lhs.radians * rhs)
     }
     
     @inlinable
-    public static func *(lhs: Float, rhs: Angle) -> Angle {
+    public static func *(lhs: Scalar, rhs: Angle) -> Angle {
         return Angle(radians: rhs.radians * lhs)
     }
     
     // MARK: division (scaling)
     
     @inlinable
-    public static func /=(lhs: inout Angle, rhs: Float) {
+    public static func /=(lhs: inout Angle, rhs: Scalar) {
         lhs = Angle(radians: lhs.radians / rhs)
     }
     
     @inlinable
-    public static func /(lhs: Angle, rhs: Float) -> Angle {
+    public static func /(lhs: Angle, rhs: Scalar) -> Angle {
         return Angle(radians: lhs.radians / rhs)
     }
     
@@ -166,23 +176,18 @@ postfix operator °
 /// - remark: 
 /// * Degree operator is the unicode symbol U+00B0 DEGREE SIGN
 /// * macOS shortcut is ⌘+⇧+8
-public postfix func °(lhs: Float) -> Angle {
+public postfix func °<Scalar>(lhs: Scalar) -> Angle<Scalar> {
     return Angle(degrees: lhs)
-}
-
-/// Constructs an `Angle` from the specified `Int` value in degrees
-public postfix func °(lhs: Int) -> Angle {
-    return Angle(degrees: Float(lhs))
 }
 
 // MARK: - Convenience functions
 
 /// Constructs an `Angle` from the specified floating point value in degrees
-public func deg(_ a: Float) -> Angle {
+public func deg<Scalar>(_ a: Scalar) -> Angle<Scalar> {
     return Angle(degrees: a)
 }
 
 /// Constructs an `Angle` from the specified floating point value in radians
-public func rad(_ a: Float) -> Angle {
+public func rad<Scalar>(_ a: Scalar) -> Angle<Scalar> {
     return Angle(radians: a)
 }
