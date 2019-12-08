@@ -225,13 +225,13 @@ extension Matrix4x4 where Scalar: Real {
         let bb   = near * aa
         
         var r = Matrix4x4()
-        r[0,0] = w
-        r[1,1] = h
-        r[2,0] = -x
-        r[2,1] = -y
-        r[2,2] = aa
-        r[2,3] = 1
-        r[3,2] = -bb
+        r[0][0] = w
+        r[1][1] = h
+        r[2][0] = -x
+        r[2][1] = -y
+        r[2][2] = aa
+        r[2][3] = 1
+        r[3][2] = -bb
         
         return r
     }
@@ -244,13 +244,13 @@ extension Matrix4x4 where Scalar: Real {
         let bb   = near * aa
         
         var r = Matrix4x4()
-        r[0,0] = w
-        r[1,1] = h
-        r[2,0] = x
-        r[2,1] = y
-        r[2,2] = -aa
-        r[2,3] = -1
-        r[3,2] = -bb
+        r[0][0] = w
+        r[1][1] = h
+        r[2][0] = x
+        r[2][1] = y
+        r[2][2] = -aa
+        r[2][3] = -1
+        r[3][2] = -bb
         
         return r
     }
@@ -272,13 +272,13 @@ extension Matrix4x4 where Scalar: Real {
         let ff = near * -cc
         
         var r = Matrix4x4()
-        r[0,0] = aa
-        r[1,1] = bb
-        r[2,2] = cc
-        r[3,0] = dd + offset
-        r[3,1] = ee
-        r[3,2] = ff
-        r[3,3] = 1
+        r[0][0] = aa
+        r[1][1] = bb
+        r[2][2] = cc
+        r[3][0] = dd + offset
+        r[3][1] = ee
+        r[3][2] = ff
+        r[3][3] = 1
         
         return r
     }
@@ -295,13 +295,13 @@ extension Matrix4x4 where Scalar: Real {
         // If r[3,2] and r[2, 2] have the same sign, we're right-handed
         
         var r = Matrix4x4()
-        r[0,0] = aa
-        r[1,1] = bb
-        r[2,2] = -cc
-        r[3,0] = dd + offset
-        r[3,1] = ee
-        r[3,2] = ff
-        r[3,3] = 1
+        r[0][0] = aa
+        r[1][1] = bb
+        r[2][2] = -cc
+        r[3][0] = dd + offset
+        r[3][1] = ee
+        r[3][2] = ff
+        r[3][3] = 1
         
         return r
     }
