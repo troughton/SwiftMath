@@ -132,8 +132,7 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
         result.r1 *= scaleFactor
         result.r2 *= scaleFactor
         
-        let translation = result * self.translation
-        result.translation = -(result * self.translation)
+        result.translation.xyz = -(result * self.translation).xyz
         return result
     }
     
@@ -145,8 +144,7 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
         result.r1 = SIMD4(self.r0.y, self.r1.y, self.r2.y, 0)
         result.r2 = SIMD4(self.r0.z, self.r1.z, self.r2.z, 0)
         
-        let translation = result * self.translation
-        result.translation = -(result * self.translation)
+        result.translation.xyz = -(result * self.translation).xyz
 
         return result
     }
