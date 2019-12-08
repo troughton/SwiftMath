@@ -11,17 +11,16 @@ import Real
 public struct Quaternion<Scalar : SIMDScalar & BinaryFloatingPoint & Real>: Hashable {
     public static var identity : Quaternion { return Quaternion(0, 0, 0, 1) }
     
-    public var x: Scalar
-    public var y: Scalar
-    public var z: Scalar
-    public var w: Scalar
+    public var storage : SIMD4<Scalar>
     
     @inlinable
     public init(_ x: Scalar, _ y: Scalar, _ z: Scalar, _ w: Scalar) {
-        self.x = x
-        self.y = y
-        self.z = z
-        self.w = w
+        self.storage = SIMD4(x, y, z, w)
+    }
+    
+    @inlinable
+    public init(_ storage: SIMD4<Scalar>) {
+        self.storage = storage
     }
     
     @inlinable
@@ -57,6 +56,45 @@ public struct Quaternion<Scalar : SIMDScalar & BinaryFloatingPoint & Real>: Hash
         self = Quaternion(x, y, z, w)
     }
     
+    @inlinable
+    public var x : Scalar {
+        get {
+            return self.storage.x
+        }
+        set {
+            self.storage.x = newValue
+        }
+    }
+    
+    @inlinable
+    public var y : Scalar {
+        get {
+            return self.storage.y
+        }
+        set {
+            self.storage.y = newValue
+        }
+    }
+    
+    @inlinable
+    public var z : Scalar {
+        get {
+            return self.storage.z
+        }
+        set {
+            self.storage.z = newValue
+        }
+    }
+    
+    @inlinable
+    public var w : Scalar {
+        get {
+            return self.storage.w
+        }
+        set {
+            self.storage.w = newValue
+        }
+    }
     
     @inlinable
     public var eulerAngles : SIMD3<Scalar> {
