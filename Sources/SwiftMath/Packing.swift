@@ -46,7 +46,8 @@ struct FloatBits {
 }
 
 
-public struct Float16 {
+@frozen
+public struct Float16 : Hashable, Codable {
     public var bitPattern : UInt16
     
     @inlinable
@@ -107,6 +108,17 @@ extension Float16 {
         self.init(bitPattern: UInt16(result))
     }
 }
+
+
+extension Float16 : ExpressibleByFloatLiteral {
+    public typealias FloatLiteralType = Float
+    
+    @inlinable
+    public init(floatLiteral value: Self.FloatLiteralType) {
+        self.init(value)
+    }
+}
+
 
 public enum Packing {
     
