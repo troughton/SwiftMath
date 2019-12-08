@@ -109,7 +109,6 @@ extension Float16 {
     }
 }
 
-
 extension Float16 : ExpressibleByFloatLiteral {
     public typealias FloatLiteralType = Float
     

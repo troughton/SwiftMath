@@ -43,14 +43,30 @@ public struct Angle<Scalar: BinaryFloatingPoint & Real> : Hashable {
 
 extension Angle : Codable where Scalar : Codable {}
 
-@inlinable
-public func sincos<Scalar>(_ a: Angle<Scalar>) -> (sin: Scalar, cos: Scalar) {
-    let s: Scalar = Scalar.sin(a.radians)
-    let c: Scalar = Scalar.cos(a.radians)
-    
-    return (sin: s, cos: c)
-}
+extension Angle {
+    @inlinable
+    public static func sin(_ a: Angle<Scalar>) -> Scalar {
+        return Scalar.cos(a.radians)
+    }
 
+    @inlinable
+    public static func cos(_ a: Angle<Scalar>) -> Scalar {
+        return Scalar.cos(a.radians)
+    }
+    
+    @inlinable
+    public static func tan(_ a: Angle<Scalar>) -> Scalar {
+        return Scalar.tan(a.radians)
+    }
+
+    @inlinable
+    public static func sincos(_ a: Angle<Scalar>) -> (sin: Scalar, cos: Scalar) {
+        let s: Scalar = Scalar.sin(a.radians)
+        let c: Scalar = Scalar.cos(a.radians)
+        
+        return (sin: s, cos: c)
+    }
+}
 
 extension Angle: CustomStringConvertible, CustomDebugStringConvertible {
     public var description: String {
