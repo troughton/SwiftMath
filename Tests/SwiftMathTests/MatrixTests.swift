@@ -100,4 +100,28 @@ class MatrixTests: XCTestCase {
             }
         }
     }
+
+    func testMat3Inverse() {
+        let matrix = Matrix3x3<Float>(AffineMatrix<Float>.rotate(x: rad(10.0), y: rad(0.34), z: rad(42.0)))
+        
+        let product = matrix * matrix.inverse
+        
+        for row in 0..<3 {
+            for col in 0..<3 {
+                XCTAssertEqual(product[row, col], row == col ? 1.0 : 0.0, accuracy: 0.0001)
+            }
+        }
+    }
+    
+    func testMat4Inverse() {
+        let matrix = Matrix4x4<Float>.projLH(x: 3.0, y: 4.0, w: 10.0, h: 10.0, near: 0.1, far: 200.0)
+        
+        let product = matrix * matrix.inverse
+        
+        for row in 0..<4 {
+            for col in 0..<4 {
+                XCTAssertEqual(product[row, col], row == col ? 1.0 : 0.0, accuracy: 0.0001)
+            }
+        }
+    }
 }
