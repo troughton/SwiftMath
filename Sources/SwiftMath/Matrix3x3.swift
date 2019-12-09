@@ -201,7 +201,7 @@ extension Matrix3x3 where Scalar : Real {
         tmp1 = q.y*q.z
         tmp2 = q.x*q.w
         self[2, 1] = 2.0 * (tmp1 + tmp2)*invs
-        self[2, 2] = 2.0 * (tmp1 - tmp2)*invs
+        self[1, 2] = 2.0 * (tmp1 - tmp2)*invs
     }
 }
 
