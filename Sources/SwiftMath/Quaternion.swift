@@ -230,19 +230,19 @@ extension Matrix4x4 where Scalar : Real {
     public init(quaternion q: Quaternion<Scalar>) {
         self = Matrix4x4<Scalar>.identity
         
-        let sqw = q.w*q.w
-        let sqx = q.x*q.x
-        let sqy = q.y*q.y
-        let sqz = q.z*q.z
+        let sqw : Scalar = q.w*q.w
+        let sqx : Scalar = q.x*q.x
+        let sqy : Scalar = q.y*q.y
+        let sqz : Scalar = q.z*q.z
         
         // invs (inverse square length) is only required if quaternion is not already normalised
-        let invs = 1.0 / (sqx + sqy + sqz + sqw)
+        let invs : Scalar = 1.0 / (sqx + sqy + sqz + sqw)
         self[0, 0] = ( sqx - sqy - sqz + sqw)*invs // since sqw + sqx + sqy + sqz =1/invs*invs
         self[1, 1] = (-sqx + sqy - sqz + sqw)*invs
         self[2, 2] = (-sqx - sqy + sqz + sqw)*invs
         
-        var tmp1 = q.x*q.y
-        var tmp2 = q.z*q.w
+        var tmp1 : Scalar = q.x*q.y
+        var tmp2 : Scalar = q.z*q.w
         self[1, 0] = 2.0 * (tmp1 + tmp2)*invs
         self[0, 1] = 2.0 * (tmp1 - tmp2)*invs
         

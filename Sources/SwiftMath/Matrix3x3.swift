@@ -189,8 +189,8 @@ extension Matrix3x3 where Scalar : Real {
         self[1, 1] = (-sqx + sqy - sqz + sqw) * invs
         self[2, 2] = (-sqx - sqy + sqz + sqw) * invs
         
-        var tmp1 = q.x*q.y
-        var tmp2 = q.z*q.w
+        var tmp1 : Scalar = q.x*q.y
+        var tmp2 : Scalar = q.z*q.w
         self[1, 0] = 2.0 * (tmp1 + tmp2)*invs
         self[0, 1] = 2.0 * (tmp1 - tmp2)*invs
         
