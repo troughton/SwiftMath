@@ -6,7 +6,7 @@
 //
 //
 
-import Real
+import RealModule
 
 // MARK: Linear
 public func linear(_ time: Float) -> Float {

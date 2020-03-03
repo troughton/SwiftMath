@@ -6,7 +6,7 @@
 //
 //
 
-import Real
+import RealModule
 
 extension UInt {
     

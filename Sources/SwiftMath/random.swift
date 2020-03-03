@@ -6,7 +6,7 @@
 //
 //
 
-import Real
+import RealModule
 
 extension SIMD2 where Scalar : Real, Scalar: BinaryFloatingPoint, Scalar.RawSignificand: BinaryInteger & FixedWidthInteger {
     /**  

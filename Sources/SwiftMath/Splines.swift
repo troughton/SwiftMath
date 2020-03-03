@@ -6,7 +6,7 @@
 //  Copyright © 2017 troughton. All rights reserved.
 //
 
-import Real
+import RealModule
 
 @frozen
 public struct CubicPolynomial<T: SIMD> where T.Scalar == Float {

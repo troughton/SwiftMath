@@ -8,10 +8,10 @@ let package = Package(
         .library(name: "SwiftMath", targets: ["SwiftMath"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-numerics", from: Version(0, 0, 3))
+        .package(url: "https://github.com/apple/swift-numerics", from: Version(0, 0, 5))
     ],
     targets: [
-        .target(name: "SwiftMath", dependencies: ["Real"]),
-        .testTarget(name: "SwiftMathTests", dependencies: ["SwiftMath", "Real"]),
+        .target(name: "SwiftMath", dependencies: ["RealModule"]),
+        .testTarget(name: "SwiftMathTests", dependencies: ["SwiftMath", "RealModule"]),
     ]
 )

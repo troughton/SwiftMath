@@ -6,7 +6,7 @@
 //
 
 import XCTest
-import Real
+import RealModule
 @testable import SwiftMath
 
 class MatrixTests: XCTestCase {

@@ -7,7 +7,7 @@
 //
 
 import Swift
-import Real
+import RealModule
 
 @frozen
 public struct Rect<Scalar: SIMDScalar & BinaryFloatingPoint & Comparable>: Hashable, Codable {

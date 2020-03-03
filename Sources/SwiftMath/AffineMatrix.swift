@@ -5,7 +5,7 @@
 //  Created by Thomas Roughton on 3/08/18.
 //
 
-import Real
+import RealModule
 
 /// A matrix that can represent 3D affine transformations.
 /// Internally, the data is stored in row-major format for size reasons;

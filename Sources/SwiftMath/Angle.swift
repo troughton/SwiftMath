@@ -2,7 +2,7 @@
 // License: https://github.com/SwiftGFX/SwiftMath#license-bsd-2-clause
 //
 
-import Real
+import RealModule
 
 /// A floating point value that represents an angle
 @frozen

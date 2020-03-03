@@ -3,7 +3,7 @@
 //
 
 import Swift
-import Real
+import RealModule
 
 @frozen
 public struct Matrix3x3<Scalar: SIMDScalar & BinaryFloatingPoint> : Hashable, Codable {

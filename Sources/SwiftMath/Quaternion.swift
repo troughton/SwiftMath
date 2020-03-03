@@ -6,7 +6,7 @@
 //
 //
 
-import Real
+import RealModule
 
 public struct Quaternion<Scalar : SIMDScalar & BinaryFloatingPoint & Real>: Hashable {
     public static var identity : Quaternion { return Quaternion(0, 0, 0, 1) }
