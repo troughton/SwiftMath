@@ -5,7 +5,7 @@
 import RealModule
 
 @frozen
-public struct Matrix4x4<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, Codable {
+public struct Matrix4x4<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable {
     public var c0: SIMD4<Scalar> = SIMD4(1, 0, 0, 0)
     public var c1: SIMD4<Scalar> = SIMD4(0, 1, 0, 0)
     public var c2: SIMD4<Scalar> = SIMD4(0, 0, 1, 0)
@@ -324,6 +324,27 @@ extension Matrix4x4: CustomStringConvertible {
 extension Matrix4x4 : CustomDebugStringConvertible {
     public var debugDescription : String {
         return self.description
+    }
+}
+
+extension Matrix4x4: Codable {
+    @inlinable
+    public init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        let c0 = try container.decode(SIMD4<Scalar>.self)
+        let c1 = try container.decode(SIMD4<Scalar>.self)
+        let c2 = try container.decode(SIMD4<Scalar>.self)
+        let c3 = try container.decode(SIMD4<Scalar>.self)
+        self.init(c0, c1, c2, c3)
+    }
+    
+    @inlinable
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(self.c0)
+        try container.encode(self.c1)
+        try container.encode(self.c2)
+        try container.encode(self.c3)
     }
 }
 

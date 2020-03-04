@@ -6,7 +6,7 @@ import Swift
 
 /// A column-major 2x2 matrix.
 @frozen
-public struct Matrix2x2<Scalar: SIMDScalar & BinaryFloatingPoint> : Hashable, Codable {
+public struct Matrix2x2<Scalar: SIMDScalar & BinaryFloatingPoint> : Hashable {
     public var columns: SIMD4<Scalar> = .init(1, 0, 0, 1)
   
     @inlinable
@@ -143,6 +143,23 @@ extension Matrix2x2: CustomStringConvertible {
     /// Displays the matrix in column-major order
     public var description: String {
         return "Matrix2x2(\n\(self[0]), \(self[1]))\n)"
+    }
+}
+
+extension Matrix2x2: Codable {
+    @inlinable
+    public init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        let c0 = try container.decode(SIMD2<Scalar>.self)
+        let c1 = try container.decode(SIMD2<Scalar>.self)
+        self.init(c0, c1)
+    }
+    
+    @inlinable
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(self.columns.xy)
+        try container.encode(self.columns.zw)
     }
 }
 

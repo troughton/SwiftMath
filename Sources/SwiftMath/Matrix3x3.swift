@@ -6,7 +6,7 @@ import Swift
 import RealModule
 
 @frozen
-public struct Matrix3x3<Scalar: SIMDScalar & BinaryFloatingPoint> : Hashable, Codable {
+public struct Matrix3x3<Scalar: SIMDScalar & BinaryFloatingPoint> : Hashable {
     public var c0: SIMD3<Scalar> = SIMD3(1, 0, 0)
     public var c1: SIMD3<Scalar> = SIMD3(0, 1, 0)
     public var c2: SIMD3<Scalar> = SIMD3(0, 0, 1)
@@ -210,6 +210,25 @@ extension Matrix3x3: CustomStringConvertible {
     /// Displays the matrix in column-major order
     public var description: String {
         return "Matrix3x3(\n\(self[0]), \(self[1]), \(self[2]))\n)"
+    }
+}
+
+extension Matrix3x3: Codable {
+    @inlinable
+    public init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        let c0 = try container.decode(SIMD3<Scalar>.self)
+        let c1 = try container.decode(SIMD3<Scalar>.self)
+        let c2 = try container.decode(SIMD3<Scalar>.self)
+        self.init(c0, c1, c2)
+    }
+    
+    @inlinable
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(self.c0)
+        try container.encode(self.c1)
+        try container.encode(self.c2)
     }
 }
 

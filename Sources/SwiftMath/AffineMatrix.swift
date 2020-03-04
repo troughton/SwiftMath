@@ -566,7 +566,7 @@ extension AffineMatrix where Scalar : Real {
         r1.z = 2.0 * (tmp1 - tmp2)
         
         let sqLength : Scalar = sqx + sqy + sqz + sqw
-        var scale = scale / sqLength
+        let scale = scale / sqLength
         r0.xyz *= scale
         r1.xyz *= scale
         r2.xyz *= scale
