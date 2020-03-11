@@ -219,6 +219,14 @@ extension Matrix4x4 where Scalar: Real {
         return projLH(x: 0, y: 0, w: width, h: height, near: near, far: far)
     }
     
+    /// Creates a left-handed perspective projection matrix with the near plane mapping to Z = 1.0 and infinity mapping to Z = 0.0
+    @inlinable
+    public static func projReversedZ(fovy: Angle<Scalar>, aspect: Scalar, near: Scalar) -> Matrix4x4 {
+        let height : Scalar = 1 / Scalar.tan(fovy.radians * 0.5)
+        let width : Scalar = height * 1 / aspect;
+        return projLHReversedZ(x: 0, y: 0, w: width, h: height, near: near)
+    }
+    
     /// Creates a left-handed perspective projection matrix
     @inlinable
     public static func projLH(x: Scalar, y: Scalar, w: Scalar, h: Scalar, near: Scalar, far: Scalar) -> Matrix4x4 {
@@ -234,6 +242,23 @@ extension Matrix4x4 where Scalar: Real {
         r[2][2] = aa
         r[2][3] = 1
         r[3][2] = -bb
+        r[3][3] = 0
+        
+        return r
+    }
+    
+    /// Creates a left-handed perspective projection with the near plane mapping to Z = 1.0 and infinity mapping to Z = 0.0
+    @inlinable
+    public static func projLHReversedZ(x: Scalar, y: Scalar, w: Scalar, h: Scalar, near: Scalar) -> Matrix4x4 {
+        var r = Matrix4x4()
+        r[0][0] = w
+        r[1][1] = h
+        r[2][0] = -x
+        r[2][1] = -y
+        r[2][2] = 0
+        r[2][3] = 1
+        r[3][2] = near
+        r[3][3] = 0
         
         return r
     }
@@ -253,6 +278,7 @@ extension Matrix4x4 where Scalar: Real {
         r[2][2] = -aa
         r[2][3] = -1
         r[3][2] = -bb
+        r[3][3] = 0
         
         return r
     }
