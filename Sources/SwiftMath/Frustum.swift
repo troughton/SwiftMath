@@ -8,7 +8,7 @@
 
 import Swift
 
-public enum Extent : Int {
+public enum Extent : Int, CaseIterable {
     case minX_MinY_MinZ = 0b000
     case minX_MinY_MaxZ = 0b001
     case minX_MaxY_MinZ = 0b010
@@ -17,13 +17,10 @@ public enum Extent : Int {
     case maxX_MinY_MaxZ = 0b101
     case maxX_MaxY_MinZ = 0b110
     case maxX_MaxY_MaxZ = 0b111
-    case lastElement
     
     static let MaxXFlag = 0b100
     static let MaxYFlag = 0b010
     static let MaxZFlag = 0b001
-    
-    static let values = (0..<Extent.lastElement.rawValue).map { rawValue -> Extent in return Extent(rawValue: rawValue)! }
 }
 
 @frozen

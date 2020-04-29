@@ -11,9 +11,30 @@ extension SIMD3 {
     }
 }
 
-extension SIMD3 where Scalar: Real, Scalar : BinaryFloatingPoint, Scalar.RawSignificand : FixedWidthInteger {
+extension SIMD3 where Scalar: RealFunctions & FloatingPoint {
     @inlinable
-    public var orthonormalBasis : (tangent: SIMD3<Scalar>, bitangent: SIMD3<Scalar>) {
+    public init(theta: Scalar, phi: Scalar) {
+        let x = Scalar.sin(theta) * Scalar.sin(phi)
+        let y = Scalar.sin(theta) * Scalar.cos(phi)
+        let z = Scalar.cos(theta)
+        
+        self.init(x, y, z)
+    }
+    
+    @inlinable
+    public var theta: Scalar {
+        return .acos(self.z)
+    }
+    
+    @inlinable
+    public var phi: Scalar {
+        return .atan2(y: self.y, x: self.x)
+    }
+}
+
+extension SIMD3 where Scalar: Real, Scalar: BinaryFloatingPoint, Scalar.RawSignificand: FixedWidthInteger {
+    @inlinable
+    public var orthonormalBasis: (tangent: SIMD3<Scalar>, bitangent: SIMD3<Scalar>) {
         let n = self
         let sign : Scalar = n.z.sign == .plus ? 1.0 : -1.0
         let a = -1.0 / (sign + n.z);
