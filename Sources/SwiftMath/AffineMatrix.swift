@@ -141,21 +141,40 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
     
     @inlinable
     public var inverse : AffineMatrix {
-        var result = self
-        result.r0 = SIMD4(self.r0.x, self.r1.x, self.r2.x, 0)
-        result.r1 = SIMD4(self.r0.y, self.r1.y, self.r2.y, 0)
-        result.r2 = SIMD4(self.r0.z, self.r1.z, self.r2.z, 0)
+        // https://lxjk.github.io/2017/09/03/Fast-4x4-Matrix-Inverse-with-SSE-SIMD-Explained.html#_general_matrix_inverse
         
-        var rowLengthsSq : SIMD3<Scalar> = result.r0.xyz * result.r0.xyz
-        rowLengthsSq.addProduct(result.r1.xyz, result.r1.xyz)
-        rowLengthsSq.addProduct(result.r2.xyz, result.r2.xyz)
+        var result = AffineMatrix()
+
+        // transpose 3x3, we know m30 = m31 = m32 = 0
+        let t0 = SIMD4(self.r0.x, self.r1.x, self.r0.y, self.r1.y) // 00, 10, 01, 11
+        let t1 = SIMD4(self.r2.x, 0.0, self.r2.y, 0.0) // 20, 30, 21, 31
+        result.r0 = SIMD4(t0.x, t0.z, self.r0.z, 0.0) // 00, 01, 02, 32(=0)
+        result.r1 = SIMD4(t0.y, t0.w, self.r1.z, 0.0) // 10, 11, 12, 32(=0)
+        result.r2 = SIMD4(t1.x, t1.z, self.r2.z, 0.0) // 20, 21, 22, 32(=0)
+
+        // (SizeSqr(mVec[0]), SizeSqr(mVec[1]), SizeSqr(mVec[2]), 0)
+        var sizeSqr = self.r0.xyz * self.r0.xyz
+        sizeSqr.addProduct(self.r1.xyz, self.r1.xyz)
+        sizeSqr.addProduct(self.r2.xyz, result.r2.xyz)
+
+        // optional test to avoid divide by 0
+        // for each component, if(sizeSqr < SMALL_NUMBER) sizeSqr = 1;
+        let rSizeSqr = (1.0 / sizeSqr).replacing(with: 1.0, where: sizeSqr .< 1.0e-8)
+
+        result.r0 *= rSizeSqr.x
+        result.r1 *= rSizeSqr.y
+        result.r2 *= rSizeSqr.z
+
+        // last line
+        var translation = SIMD3<Scalar>.zero
+        translation = SIMD3(result.r0.x, result.r1.x, result.r2.x) * self.r0.w
+        translation.addProduct(SIMD3(result.r0.y, result.r1.y, result.r2.y), self.r1.w)
+        translation.addProduct(SIMD3(result.r0.z, result.r1.z, result.r2.z), self.r2.w)
         
-        let scaleFactor = SIMD4(SIMD3(repeating: 1) / rowLengthsSq.squareRoot(), 1)
-        result.r0 *= scaleFactor
-        result.r1 *= scaleFactor
-        result.r2 *= scaleFactor
+        result.r0.w = -translation.x
+        result.r1.w = -translation.y
+        result.r2.w = -translation.z
         
-        result.translation.xyz = -(result * self.translation).xyz
         return result
     }
     
