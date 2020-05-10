@@ -26,7 +26,7 @@ target_sources(SwiftMath PRIVATE
 )
 
 target_link_libraries(SwiftMath PRIVATE
-  RealModule)
+  _NumericsShims RealModule)
 
 install(TARGETS SwiftMath
   ARCHIVE DESTINATION lib

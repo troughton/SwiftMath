@@ -19,7 +19,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL Windows OR CMAKE_SYSTEM_NAME STREQUAL Darwin)
 endif()
 
 include(CTest)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/swift-numerics/cmake/modules")
 
+set(SWIFTMATH_BUILD_TESTING ${BUILD_TESTING})
+set(BUILD_TESTING NO)
+
+add_subdirectory(swift-numerics)
 add_subdirectory(Sources/SwiftMath)
-
-
+set(BUILD_TESTING ${SWIFTMATH_BUILD_TESTING})

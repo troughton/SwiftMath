@@ -78,7 +78,7 @@ public func cross<S>(_ u: SIMD3<S>, _ v: SIMD3<S>) -> SIMD3<S> where S : Numeric
     x -= u.z * v.y
     var y : S = u.z * v.x
     y -= u.x * v.z
-    var z = u.x * v.y
+    var z : S = u.x * v.y
     z -= u.y * v.x
     return SIMD3<S>(x, y, z)
 }
