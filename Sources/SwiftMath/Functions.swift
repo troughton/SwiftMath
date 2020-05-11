@@ -42,6 +42,11 @@ public func clamp(_ x: Double, min _min: Double, max _max: Double) -> Double {
     return clamped
 }
 
+@inlinable
+public func clamp<S: SIMD>(_ x: S, min _min: S, max _max: S) -> S where S.Scalar: FloatingPoint {
+    return pointwiseMin(pointwiseMax(x, _min), _max)
+}
+
 /// Returns x, where 0.0 ≤ x ≤ 1.0
 @inlinable
 public func saturate(_ x: Float) -> Float {
@@ -52,6 +57,11 @@ public func saturate(_ x: Float) -> Float {
 @inlinable
 public func saturate<T:BinaryFloatingPoint>(_ x: T) -> T {
     return clamp(x, min: 0.0, max: 1.0)
+}
+
+@inlinable
+public func saturate<S: SIMD>(_ x: S) -> S where S.Scalar: FloatingPoint {
+    return clamp(x, min: S.zero, max: S.one)
 }
 
 /// Performs a linear interpolation between a and b by the interpolant t
