@@ -6,7 +6,6 @@
 //
 
 public struct RGBColour : Equatable {
-    
     public var r: Float
     public var g: Float
     public var b: Float
@@ -31,6 +30,13 @@ public struct RGBColour : Equatable {
         self.r = r
         self.g = g
         self.b = b
+    }
+    
+    @inlinable
+    public init(_ rgb: SIMD3<Float>) {
+        self.r = rgb.x
+        self.g = rgb.y
+        self.b = rgb.z
     }
     
     @inlinable
@@ -125,6 +131,22 @@ public struct RGBAColour : Equatable, Hashable {
         self.g = g
         self.b = b
         self.a = a
+    }
+    
+    @inlinable
+    public init(rgb: SIMD3<Float>, a: Float = 1.0) {
+        self.r = rgb.x
+        self.g = rgb.y
+        self.b = rgb.z
+        self.a = a
+    }
+    
+    @inlinable
+    public init(_ rgba: SIMD4<Float>) {
+        self.r = rgba.x
+        self.g = rgba.y
+        self.b = rgba.z
+        self.a = rgba.w
     }
     
     @inlinable
