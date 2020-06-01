@@ -392,39 +392,37 @@ extension AffineMatrix where Scalar : Real {
     
     @inlinable
     public init(quaternion q: Quaternion<Scalar>) {
-        self = AffineMatrix.identity
-        
+        self.init()
         let sqw : Scalar = q.w*q.w
         let sqx : Scalar = q.x*q.x
         let sqy : Scalar = q.y*q.y
         let sqz : Scalar = q.z*q.z
         
-        // invs (inverse square length) is only required if quaternion is not already normalised
-        let invs = 1.0 / (sqx + sqy + sqz + sqw)
-        self.r0.x = ( sqx - sqy - sqz + sqw)*invs // since sqw + sqx + sqy + sqz =1/invs*invs
-        self.r1.y = (-sqx + sqy - sqz + sqw)*invs
-        self.r2.z = (-sqx - sqy + sqz + sqw)*invs
+        let n : Scalar = sqx + sqy + sqz + sqw
+        let s : Scalar = n == 0 ? 0 : 2.0 / n
         
-        var tmp1 : Scalar = q.x*q.y
-        var tmp2 : Scalar = q.z*q.w
-        self.r1.x = 2.0 * (tmp1 + tmp2)*invs
-        self.r0.y = 2.0 * (tmp1 - tmp2)*invs
+        let wx = s * q.w * q.x
+        let wy = s * q.w * q.y
+        let wz = s * q.w * q.z
+        let xx = s * sqx
+        let xy = s * q.x * q.y
+        let xz = s * q.x * q.z
+        let yy = s * sqy
+        let yz = s * q.y * q.z
+        let zz = s * sqz
         
-        tmp1 = q.x*q.z
-        tmp2 = q.y*q.w
-        self.r2.x = 2.0 * (tmp1 - tmp2)*invs
-        self.r0.z = 2.0 * (tmp1 + tmp2)*invs
-        tmp1 = q.y*q.z
-        tmp2 = q.x*q.w
-        self.r2.y = 2.0 * (tmp1 + tmp2)*invs
-        self.r1.z = 2.0 * (tmp1 - tmp2)*invs
+        self[0,0] = 1.0 - (yy + zz)
+        self[0,1] = xy - wz
+        self[0,2] = xz + wy
+        self[1,0] = xy + wz
+        self[1,1] = 1.0 - (xx + zz)
+        self[1,2] = yz - wx
+        self[2,0] = xz - wy
+        self[2,1] = yz + wx
+        self[2,2] = 1.0 - (xx + yy)
     }
     
-    /// Create a matrix with rotates around the x axis
-    ///
-    /// - parameter x: angle
-    ///
-    /// - returns: a new rotation matrix
+    /// Create a matrix with rotates clockwise around the x axis
     @inlinable
     public static func rotate(x: Angle<Scalar>) -> AffineMatrix {
         let (sin: sx, cos: cx) = Angle<Scalar>.sincos(x)
@@ -432,77 +430,86 @@ extension AffineMatrix where Scalar : Real {
         var r = AffineMatrix()
         r[0, 0] = 1.0
         r[1, 1] = cx
-        r[2, 1] = -sx
         r[1, 2] = sx
+        r[2, 1] = -sx
         r[2, 2] = cx
         
         return r
     }
     
-    /// Returns a transformation matrix that rotates around the y axis
+    /// Returns a transformation matrix that rotates clockwise around the y axis
     @inlinable
     public static func rotate(y: Angle<Scalar>) -> AffineMatrix {
         let (sin: sy, cos: cy) = Angle<Scalar>.sincos(y)
         
         var r = AffineMatrix()
         r[0,0] = cy
-        r[2,0] = sy
-        r[1,1] = 1.0
         r[0,2] = -sy
+        r[1,1] = 1.0
+        r[2,0] = sy
         r[2,2] = cy
         
         return r
     }
     
-    /// Returns a transformation matrix that rotates around the z axis
+    /// Returns a transformation matrix that rotates clockwise around the z axis
     @inlinable
     public static func rotate(z: Angle<Scalar>) -> AffineMatrix {
         let (sin: sz, cos: cz) = Angle<Scalar>.sincos(z)
         
         var r = AffineMatrix()
         r[0,0] = cz
-        r[1,0] = -sz
         r[0,1] = sz
+        r[1,0] = -sz
         r[1,1] = cz
         r[2,2] = 1.0
         
         return r
     }
     
-    /// Returns a transformation matrix that rotates around the x and then y axes
+    /// Returns a transformation matrix that rotates clockwise around the given axis
     @inlinable
-    public static func rotate(x: Angle<Scalar>, y: Angle<Scalar>) -> AffineMatrix {
-        let (sx, cx) = Angle<Scalar>.sincos(x)
-        let (sy, cy) = Angle<Scalar>.sincos(y)
+    public static func rotate(angle: Angle<Scalar>, axis: SIMD3<Scalar>) -> AffineMatrix {
+        let (sin: st, cos: ct) = Angle<Scalar>.sincos(angle)
         
-        return AffineMatrix(rows: SIMD4<Scalar>(cy, sx*sy, -cx*sy, 0.0),
-                            SIMD4<Scalar>(0.0, cx, sx, 0.0),
-                            SIMD4<Scalar>(sy, -sx * cy, cx * cy, 0.0)
-            )
-    }
-    
-    /// Returns a transformation matrix that rotates around the x, y and then z axes
-    @inlinable
-    public static func rotate(x: Angle<Scalar>, y: Angle<Scalar>, z: Angle<Scalar>) -> AffineMatrix {
-        let (sx, cx) = Angle<Scalar>.sincos(x)
-        let (sy, cy) = Angle<Scalar>.sincos(y)
-        let (sz, cz) = Angle<Scalar>.sincos(z)
+        let oneMinusCT = 1.0 - ct
         
         var r = AffineMatrix()
-        r[0,0] = (cy * cz) as Scalar
-        r[1,0] = -(cy * sz) as Scalar
-        r[2,0] = sy as Scalar
-        r[0,1] = (cz * sx * sy) as Scalar + (cx * sz) as Scalar
-        r[1,1] = (cx * cz) as Scalar - (sx * sy * sz) as Scalar
-        r[2,1] = -(cy * sx) as Scalar
-        r[0,2] = -(cx * cz * sy) as Scalar + (sx * sz) as Scalar
-        r[1,2] = (cz * sx) as Scalar + (cx * sy * sz) as Scalar
-        r[2,2] = (cx * cy) as Scalar
+        r[0,0] = (axis.x * axis.x * oneMinusCT as Scalar) + (ct as Scalar)
+        r[0,1] = (axis.x * axis.y * oneMinusCT as Scalar) + (axis.z * st as Scalar)
+        r[0,2] = (axis.x * axis.z * oneMinusCT as Scalar) - (axis.y * st as Scalar)
+        r[1,0] = (axis.x * axis.y * oneMinusCT as Scalar) - (axis.z * st as Scalar)
+        r[1,1] = (axis.y * axis.y * oneMinusCT as Scalar) + (ct as Scalar)
+        r[1,2] = (axis.y * axis.z * oneMinusCT as Scalar) + (axis.x * st as Scalar)
+        r[2,0] = (axis.x * axis.z * oneMinusCT as Scalar) + (axis.y * st as Scalar)
+        r[2,1] = (axis.y * axis.z * oneMinusCT as Scalar) - (axis.x * st as Scalar)
+        r[2,2] = (axis.z * axis.z * oneMinusCT as Scalar) + (ct as Scalar)
         
         return r
     }
     
-    /// Returns a transformation matrix that rotates around the z, y and then x axes
+    /// Returns a transformation matrix that rotates clockwise around the x and then y axes
+    @inlinable
+    public static func rotate(x: Angle<Scalar>, y: Angle<Scalar>) -> AffineMatrix {
+        // TODO: optimize.
+        return AffineMatrix.rotate(y: y) * AffineMatrix.rotate(x: x)
+    }
+    
+    /// Returns a transformation matrix that rotates clockwise around the x, y, and then z axes
+    @inlinable
+    public static func rotate(x: Angle<Scalar>, y: Angle<Scalar>, z: Angle<Scalar>) -> AffineMatrix {
+        // TODO: optimize.
+        return AffineMatrix.rotate(z: z) * AffineMatrix.rotate(y: y) * AffineMatrix.rotate(x: x)
+    }
+    
+    /// Returns a transformation matrix that rotates clockwise around the y, x, and then z axes
+    @inlinable
+    public static func rotate(y: Angle<Scalar>, x: Angle<Scalar>, z: Angle<Scalar>) -> AffineMatrix {
+        // TODO: optimize.
+        return AffineMatrix.rotate(z: z) * AffineMatrix.rotate(x: x) * AffineMatrix.rotate(y: y)
+    }
+    
+    /// Returns a transformation matrix that rotates clockwise around the z, y, and then x axes
     @inlinable
     public static func rotate(z: Angle<Scalar>, y: Angle<Scalar>, x: Angle<Scalar>) -> AffineMatrix {
         let (sx, cx) = Angle<Scalar>.sincos(x)
@@ -521,34 +528,6 @@ extension AffineMatrix where Scalar : Real {
         r[2,2] = (cx * cy) as Scalar
         
         return r
-    }
-    
-    /// Returns a transformation matrix which can be used to scale, rotate and translate vectors
-    @inlinable
-    public static func scaleRotateTranslate(sx _sx: Scalar, sy _sy: Scalar, sz _sz: Scalar,
-                                            ax: Angle<Scalar>, ay: Angle<Scalar>, az: Angle<Scalar>,
-                                            tx: Scalar, ty: Scalar, tz: Scalar) -> AffineMatrix {
-        let (sx, cx) = Angle<Scalar>.sincos(ax)
-        let (sy, cy) = Angle<Scalar>.sincos(ay)
-        let (sz, cz) = Angle<Scalar>.sincos(az)
-        
-        let sxsz : Scalar = sx*sz
-        let cycz : Scalar = cy*cz
-        
-        var r0 = SIMD3<Scalar>(_sx, _sy, _sz)
-        var r1 = SIMD3<Scalar>(_sx, _sy, _sz)
-        var r2 = SIMD3<Scalar>(_sx, _sy, _sz)
-        
-        
-        r0 *= SIMD3<Scalar>(cycz - (sxsz * sy) as Scalar, (cz * sx * sy) as Scalar + (cy * sz) as Scalar, -(cx * sy) as Scalar)
-        r1 *= SIMD3<Scalar>(-(cx * sz) as Scalar, (cx * cz) as Scalar, sx)
-        r2 *= SIMD3<Scalar>((cz * sy) as Scalar + (cy * sxsz) as Scalar, (sy * sz) as Scalar - (cycz * sx) as Scalar, cx * cy as Scalar)
-        
-        return AffineMatrix(rows:
-                            SIMD4<Scalar>(r0, tx),
-                            SIMD4<Scalar>(r1, ty),
-                            SIMD4<Scalar>(r2, tz)
-        )
     }
     
     /// Returns a transformation matrix which can be used to scale, rotate and translate vectors

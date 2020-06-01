@@ -176,32 +176,35 @@ extension Matrix3x3 where Scalar : Real {
     
     @inlinable
     public init(quaternion q: Quaternion<Scalar>) {
-        self.init(diagonal: SIMD3<Scalar>(repeating: 1.0))
+        self.init()
         
         let sqw : Scalar = q.w*q.w
         let sqx : Scalar = q.x*q.x
         let sqy : Scalar = q.y*q.y
         let sqz : Scalar = q.z*q.z
         
-        // invs (inverse square length) is only required if quaternion is not already normalised
-        let invs : Scalar = 1.0 / (sqx + sqy + sqz + sqw)
-        self[0, 0] = ( sqx - sqy - sqz + sqw) * invs // since sqw + sqx + sqy + sqz =1/invs*invs
-        self[1, 1] = (-sqx + sqy - sqz + sqw) * invs
-        self[2, 2] = (-sqx - sqy + sqz + sqw) * invs
+        let n : Scalar = sqx + sqy + sqz + sqw
+        let s : Scalar = n == 0 ? 0 : 2.0 / n
         
-        var tmp1 : Scalar = q.x*q.y
-        var tmp2 : Scalar = q.z*q.w
-        self[1, 0] = 2.0 * (tmp1 + tmp2)*invs
-        self[0, 1] = 2.0 * (tmp1 - tmp2)*invs
+        let wx = s * q.w * q.x
+        let wy = s * q.w * q.y
+        let wz = s * q.w * q.z
+        let xx = s * sqx
+        let xy = s * q.x * q.y
+        let xz = s * q.x * q.z
+        let yy = s * sqy
+        let yz = s * q.y * q.z
+        let zz = s * sqz
         
-        tmp1 = q.x*q.z
-        tmp2 = q.y*q.w
-        self[2, 0] = 2.0 * (tmp1 - tmp2)*invs
-        self[0, 2] = 2.0 * (tmp1 + tmp2)*invs
-        tmp1 = q.y*q.z
-        tmp2 = q.x*q.w
-        self[2, 1] = 2.0 * (tmp1 + tmp2)*invs
-        self[1, 2] = 2.0 * (tmp1 - tmp2)*invs
+        self[0,0] = 1.0 - (yy + zz)
+        self[0,1] = xy - wz
+        self[0,2] = xz + wy
+        self[1,0] = xy + wz
+        self[1,1] = 1.0 - (xx + zz)
+        self[1,2] = yz - wx
+        self[2,0] = xz - wy
+        self[2,1] = yz + wx
+        self[2,2] = 1.0 - (xx + yy)
     }
 }
 

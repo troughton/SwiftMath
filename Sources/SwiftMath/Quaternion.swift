@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Quaternion.swift
 //  InterdimensionalLlama
 //
 //  Created by Thomas Roughton on 10/01/17.
@@ -33,27 +33,10 @@ public struct Quaternion<Scalar : SIMDScalar & BinaryFloatingPoint & Real>: Hash
         self = Quaternion(scale * axis.x, scale * axis.y, scale * axis.z, w)
     }
     
+    // The euler angles represent a rotation around Y, then around X', then around Z'.
     @inlinable
     public init(eulerAngles: SIMD3<Scalar>) {
-        let (heading, altitude, bank) = (eulerAngles.y, eulerAngles.z, eulerAngles.x)
-        
-        let c1 = Scalar.cos(heading * 0.5);
-        let c2 = Scalar.cos(altitude * 0.5);
-        let c3 = Scalar.cos(bank * 0.5);
-        let s1 = Scalar.sin(heading * 0.5);
-        let s2 = Scalar.sin(altitude * 0.5);
-        let s3 = Scalar.sin(bank * 0.5);
-        
-        var w : Scalar = c1 * c2 * c3
-        w -= s1 * s2 * s3
-        var x : Scalar = s1 * s2 * c3
-        x += c1 * c2 * s3
-        var y : Scalar = s1 * c2 * c3
-        y += c1 * s2 * s3
-        var z : Scalar = c1 * s2 * c3
-        z -= s1 * c2 * s3
-        
-        self = Quaternion(x, y, z, w)
+        self = Quaternion(angle: Angle(radians: eulerAngles.z), axis: SIMD3(0, 0, 1)) * Quaternion(angle: Angle(radians: eulerAngles.x), axis: SIMD3(1, 0, 0)) * Quaternion(angle: Angle(radians: eulerAngles.y), axis: SIMD3(0, 1, 0))
     }
     
     @inlinable
@@ -96,77 +79,40 @@ public struct Quaternion<Scalar : SIMDScalar & BinaryFloatingPoint & Real>: Hash
         }
     }
     
+    /// Applied as rotation around Y (heading), then around X' (attitude), then around Z' (bank).
+    /// Assumes a left-handed coordinate system with X to the right, Y up, and Z forward.
     @inlinable
     public var eulerAngles : SIMD3<Scalar> {
         get {
-            let qx2 : Scalar = self.x * self.x
-            let qy2 : Scalar = self.y * self.y
-            let qz2 : Scalar = self.z * self.z
-            var test : Scalar = self.x * self.y
-            test += self.z * self.w
-            if (test > 0.499) {
-                return SIMD3<Scalar>(0, 2.0 * Scalar.atan2(y: self.x, x: self.w), Scalar.pi * 0.5)
-            }
-            if (test < -0.499) {
-                return SIMD3<Scalar>(0, -2.0 * Scalar.atan2(y: self.x, x: self.w), Scalar.pi * -0.5)
-            }
-            var hY : Scalar = 2 * self.y * self.w
-            hY -= 2 * self.x * self.z
-            
-            var hX : Scalar = 1
-            hX -= 2 * qy2
-            hX -= 2 * qz2
-            
-            var sinA : Scalar = 2 * self.x * self.y
-            sinA += 2 * self.z * self.w
-            
-            var bY : Scalar = 2 * self.x * self.w
-            bY -= 2 * self.y * self.z
-            
-            var bX : Scalar = 1
-            bX -= 2 * qx2
-            bX -= 2 * qz2
-            
-            let h = Scalar.atan2(y: hY, x: hX)
-            let a = Scalar.asin(sinA)
-            let b = Scalar.atan2(y: bY, x: bX)
-            
-            return SIMD3<Scalar>(b, h, a)
+            let conj = self.conjugate
+            return SIMD3<Scalar>(conj.pitch, conj.yaw, conj.roll)
         }
         set(newValue) {
             self = Quaternion(eulerAngles: newValue)
         }
     }
     
+    /// The roll is the rotation around the positive Z axis, and is applied third.
     @inlinable
     public var roll : Scalar {
-        var factor1 : Scalar = self.x * self.y
-        factor1 += self.w * self.z
-        
-        var factor2 : Scalar = self.w * self.w
-        factor2 += self.x * self.x
-        factor2 -= self.y * self.y
-        factor2 -= self.z * self.z
-        let result = Scalar.atan2(y: 2 * factor1, x: factor2);
-        return result
+        let sinRCosP : Scalar = 2.0 * (self.x * self.y as Scalar + self.z * self.w as Scalar)
+        let cosRCosP : Scalar = 1.0 - 2.0 * (self.x * self.x as Scalar + self.z * self.z as Scalar) as Scalar
+        return -Scalar.atan2(y: sinRCosP, x: cosRCosP)
     }
     
+    /// The pitch is the rotation around the positive X axis, and is applied second.
     @inlinable
     public var pitch : Scalar {
-        var factor1 : Scalar = self.y * self.z
-        factor1 += self.w * self.x
-        var factor2 : Scalar = self.w * self.w
-        factor2 -= self.x * self.x - self.y * self.y
-        factor2 += self.z * self.z
-        return Scalar.atan2(y: 2 * factor1, x: factor2);
+        let sinP : Scalar = 2.0 * (self.w * self.x as Scalar - self.y * self.z as Scalar)
+        return -Scalar.asin(clamp(sinP, min: -1 as Scalar, max: 1 as Scalar))
     }
     
+    /// The yaw is the rotation around the positive Y axis, and is applied first.
     @inlinable
     public var yaw : Scalar {
-        var factor = self.x * self.z
-        factor -= self.w * self.y
-        let clamped = clamp(-2 * factor, min: -1, max: 1)
-        return Scalar.asin(clamped);
+        let sinYCosP: Scalar = 2.0 * (self.w * self.y as Scalar - self.x * self.z as Scalar)
+        let cosYCosP: Scalar = 1.0 - 2.0 * (self.x * self.x as Scalar + self.y * self.y as Scalar)
+        return -Scalar.atan2(y: sinYCosP, x: cosYCosP)
     }
     
     @inlinable
