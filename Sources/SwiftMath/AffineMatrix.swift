@@ -146,16 +146,16 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
         var result = AffineMatrix()
 
         // transpose 3x3, we know m30 = m31 = m32 = 0
-        let t0 = SIMD4(self.r0.x, self.r1.x, self.r0.y, self.r1.y) // 00, 10, 01, 11
-        let t1 = SIMD4(self.r2.x, 0.0, self.r2.y, 0.0) // 20, 30, 21, 31
-        result.r0 = SIMD4(t0.x, t0.z, self.r0.z, 0.0) // 00, 01, 02, 32(=0)
-        result.r1 = SIMD4(t0.y, t0.w, self.r1.z, 0.0) // 10, 11, 12, 32(=0)
-        result.r2 = SIMD4(t1.x, t1.z, self.r2.z, 0.0) // 20, 21, 22, 32(=0)
+        let t0 = SIMD4(lowHalf: self.r0.lowHalf, highHalf: self.r1.lowHalf)
+        let t1 = SIMD4(self.r0.z, 0.0, self.r1.z, 0.0)
+        result.r0 = SIMD4(lowHalf: t0.evenHalf, highHalf: SIMD2(self.r2.x, 0.0))
+        result.r1 = SIMD4(lowHalf: t0.oddHalf, highHalf: SIMD2(self.r2.y, 0.0))
+        result.r2 = SIMD4(lowHalf: t1.evenHalf, highHalf: SIMD2(self.r2.z, 0.0))
 
         // (SizeSqr(mVec[0]), SizeSqr(mVec[1]), SizeSqr(mVec[2]), 0)
         var sizeSqr = self.r0.xyz * self.r0.xyz
         sizeSqr.addProduct(self.r1.xyz, self.r1.xyz)
-        sizeSqr.addProduct(self.r2.xyz, result.r2.xyz)
+        sizeSqr.addProduct(self.r2.xyz, self.r2.xyz)
 
         // optional test to avoid divide by 0
         // for each component, if(sizeSqr < SMALL_NUMBER) sizeSqr = 1;
@@ -165,9 +165,8 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
         result.r1 *= rSizeSqr.y
         result.r2 *= rSizeSqr.z
 
-        // last line
-        var translation = SIMD3<Scalar>.zero
-        translation = SIMD3(result.r0.x, result.r1.x, result.r2.x) * self.r0.w
+        // translation = -(result * self.translation)
+        var translation = SIMD3(result.r0.x, result.r1.x, result.r2.x) * self.r0.w
         translation.addProduct(SIMD3(result.r0.y, result.r1.y, result.r2.y), self.r1.w)
         translation.addProduct(SIMD3(result.r0.z, result.r1.z, result.r2.z), self.r2.w)
         
@@ -180,13 +179,23 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
     
     @inlinable
     public var inverseNoScale : AffineMatrix {
-        // Transpose the 3x3 matrix.
-        var result = self
-        result.r0 = SIMD4(self.r0.x, self.r1.x, self.r2.x, 0)
-        result.r1 = SIMD4(self.r0.y, self.r1.y, self.r2.y, 0)
-        result.r2 = SIMD4(self.r0.z, self.r1.z, self.r2.z, 0)
+        var result = AffineMatrix()
         
-        result.translation.xyz = -(result * self.translation).xyz
+        // Transpose the 3x3 matrix.
+        let t0 = SIMD4(lowHalf: self.r0.lowHalf, highHalf: self.r1.lowHalf)
+        let t1 = SIMD4(self.r0.z, 0.0, self.r1.z, 0.0)
+        result.r0 = SIMD4(lowHalf: t0.evenHalf, highHalf: SIMD2(self.r2.x, 0.0))
+        result.r1 = SIMD4(lowHalf: t0.oddHalf, highHalf: SIMD2(self.r2.y, 0.0))
+        result.r2 = SIMD4(lowHalf: t1.evenHalf, highHalf: SIMD2(self.r2.z, 0.0))
+        
+        // translation = -(result * self.translation)
+        var translation = SIMD3(result.r0.x, result.r1.x, result.r2.x) * self.r0.w
+        translation.addProduct(SIMD3(result.r0.y, result.r1.y, result.r2.y), self.r1.w)
+        translation.addProduct(SIMD3(result.r0.z, result.r1.z, result.r2.z), self.r2.w)
+        
+        result.r0.w = -translation.x
+        result.r1.w = -translation.y
+        result.r2.w = -translation.z
 
         return result
     }
