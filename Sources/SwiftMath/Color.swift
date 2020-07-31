@@ -1,11 +1,11 @@
 //
-//  Colour.swift
+//  Color.swift
 //  LlamaCore
 //
 //  Created by Thomas Roughton on 30/07/18.
 //
 
-public struct RGBColour : Equatable {
+public struct RGBColor : Equatable {
     public var r: Float
     public var g: Float
     public var b: Float
@@ -96,12 +96,15 @@ public struct RGBColour : Equatable {
 
 extension SIMD3 where Scalar == Float {
     @inlinable
-    public init(_ colour: RGBColour) {
+    public init(_ colour: RGBColor) {
         self.init(colour.r, colour.g, colour.b)
     }
 }
 
-public struct RGBAColour : Equatable, Hashable {
+
+public typealias RGBColour = RGBColor
+
+public struct RGBAColor : Equatable, Hashable {
     
     public var r: Float
     public var g: Float
@@ -166,7 +169,7 @@ public struct RGBAColour : Equatable, Hashable {
     }
     
     @inlinable
-    public init(_ rgb: RGBColour, _ a: Float = 1.0) {
+    public init(_ rgb: RGBColor, _ a: Float = 1.0) {
         self.r = rgb.r
         self.g = rgb.g
         self.b = rgb.b
@@ -220,9 +223,9 @@ public struct RGBAColour : Equatable, Hashable {
     }
     
     @inlinable
-    public var rgb : RGBColour {
+    public var rgb : RGBColor {
         get {
-            return RGBColour(r: self.r, g: self.g, b: self.b)
+            return RGBColor(r: self.r, g: self.g, b: self.b)
         }
         set {
             self.r = newValue.r
@@ -242,100 +245,102 @@ public struct RGBAColour : Equatable, Hashable {
     }
 }
 
+public typealias RGBAColour = RGBAColor
+
 extension SIMD4 where Scalar == Float {
     @inlinable
-    public init(_ colour: RGBAColour) {
+    public init(_ colour: RGBAColor) {
         self.init(colour.r, colour.g, colour.b, colour.a)
     }
 }
 
-extension RGBColour {
+extension RGBColor {
     @inlinable
-    public static func +=(lhs: inout RGBColour, rhs: RGBColour) {
+    public static func +=(lhs: inout RGBColor, rhs: RGBColor) {
         lhs.r += rhs.r
         lhs.g += rhs.g
         lhs.b += rhs.b
     }
     
     @inlinable
-    public static func +(lhs: RGBColour, rhs: RGBColour) -> RGBColour {
+    public static func +(lhs: RGBColor, rhs: RGBColor) -> RGBColor {
         var result = lhs
         result += rhs
         return result
     }
     
     @inlinable
-    public static func -=(lhs: inout RGBColour, rhs: RGBColour) {
+    public static func -=(lhs: inout RGBColor, rhs: RGBColor) {
         lhs.r -= rhs.r
         lhs.g -= rhs.g
         lhs.b -= rhs.b
     }
     
     @inlinable
-    public static func -(lhs: RGBColour, rhs: RGBColour) -> RGBColour {
+    public static func -(lhs: RGBColor, rhs: RGBColor) -> RGBColor {
         var result = lhs
         result -= rhs
         return result
     }
     
     @inlinable
-    public static func *=(lhs: inout RGBColour, rhs: RGBColour) {
+    public static func *=(lhs: inout RGBColor, rhs: RGBColor) {
         lhs.r *= rhs.r
         lhs.g *= rhs.g
         lhs.b *= rhs.b
     }
     
     @inlinable
-    public static func *(lhs: RGBColour, rhs: RGBColour) -> RGBColour {
+    public static func *(lhs: RGBColor, rhs: RGBColor) -> RGBColor {
         var result = lhs
         result *= rhs
         return result
     }
     
     @inlinable
-    public static func *=(lhs: inout RGBColour, rhs: Float) {
+    public static func *=(lhs: inout RGBColor, rhs: Float) {
         lhs.r *= rhs
         lhs.g *= rhs
         lhs.b *= rhs
     }
     
     @inlinable
-    public static func *(lhs: RGBColour, rhs: Float) -> RGBColour {
+    public static func *(lhs: RGBColor, rhs: Float) -> RGBColor {
         var result = lhs
         result *= rhs
         return result
     }
     
     @inlinable
-    public static func *(lhs: Float, rhs: RGBColour) -> RGBColour {
+    public static func *(lhs: Float, rhs: RGBColor) -> RGBColor {
         var result = rhs
         result *= lhs
         return result
     }
     
     @inlinable
-    public static func /=(lhs: inout RGBColour, rhs: RGBColour) {
+    public static func /=(lhs: inout RGBColor, rhs: RGBColor) {
         lhs.r /= rhs.r
         lhs.g /= rhs.g
         lhs.b /= rhs.b
     }
     
     @inlinable
-    public static func /(lhs: RGBColour, rhs: RGBColour) -> RGBColour {
+    public static func /(lhs: RGBColor, rhs: RGBColor) -> RGBColor {
         var result = lhs
         result /= rhs
         return result
     }
     
     @inlinable
-    public static func ==(lhs: RGBColour, rhs: RGBColour) -> Bool {
+    public static func ==(lhs: RGBColor, rhs: RGBColor) -> Bool {
         return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b
     }
 }
 
-extension RGBAColour {
+extension RGBAColor {
     @inlinable
-    public static func +=(lhs: inout RGBAColour, rhs: RGBAColour) {
+    public static func +=(lhs: inout RGBAColor, rhs: RGBAColor) {
         lhs.r += rhs.r
         lhs.g += rhs.g
         lhs.b += rhs.b
@@ -343,14 +348,14 @@ extension RGBAColour {
     }
     
     @inlinable
-    public static func +(lhs: RGBAColour, rhs: RGBAColour) -> RGBAColour {
+    public static func +(lhs: RGBAColor, rhs: RGBAColor) -> RGBAColor {
         var result = lhs
         result += rhs
         return result
     }
     
     @inlinable
-    public static func -=(lhs: inout RGBAColour, rhs: RGBAColour) {
+    public static func -=(lhs: inout RGBAColor, rhs: RGBAColor) {
         lhs.r -= rhs.r
         lhs.g -= rhs.g
         lhs.b -= rhs.b
@@ -358,14 +363,14 @@ extension RGBAColour {
     }
     
     @inlinable
-    public static func -(lhs: RGBAColour, rhs: RGBAColour) -> RGBAColour {
+    public static func -(lhs: RGBAColor, rhs: RGBAColor) -> RGBAColor {
         var result = lhs
         result -= rhs
         return result
     }
     
     @inlinable
-    public static func *=(lhs: inout RGBAColour, rhs: RGBAColour) {
+    public static func *=(lhs: inout RGBAColor, rhs: RGBAColor) {
         lhs.r *= rhs.r
         lhs.g *= rhs.g
         lhs.b *= rhs.b
@@ -373,14 +378,14 @@ extension RGBAColour {
     }
     
     @inlinable
-    public static func *(lhs: RGBAColour, rhs: RGBAColour) -> RGBAColour {
+    public static func *(lhs: RGBAColor, rhs: RGBAColor) -> RGBAColor {
         var result = lhs
         result *= rhs
         return result
     }
     
     @inlinable
-    public static func *=(lhs: inout RGBAColour, rhs: Float) {
+    public static func *=(lhs: inout RGBAColor, rhs: Float) {
         lhs.r *= rhs
         lhs.g *= rhs
         lhs.b *= rhs
@@ -388,14 +393,14 @@ extension RGBAColour {
     }
     
     @inlinable
-    public static func *(lhs: RGBAColour, rhs: Float) -> RGBAColour {
+    public static func *(lhs: RGBAColor, rhs: Float) -> RGBAColor {
         var result = lhs
         result *= rhs
         return result
     }
     
     @inlinable
-    public static func /=(lhs: inout RGBAColour, rhs: RGBAColour) {
+    public static func /=(lhs: inout RGBAColor, rhs: RGBAColor) {
         lhs.r /= rhs.r
         lhs.g /= rhs.g
         lhs.b /= rhs.b
@@ -403,46 +408,46 @@ extension RGBAColour {
     }
     
     @inlinable
-    public static func /(lhs: RGBAColour, rhs: RGBAColour) -> RGBAColour {
+    public static func /(lhs: RGBAColor, rhs: RGBAColor) -> RGBAColor {
         var result = lhs
         result /= rhs
         return result
     }
     
     @inlinable
-    public static func ==(lhs: RGBAColour, rhs: RGBAColour) -> Bool {
+    public static func ==(lhs: RGBAColor, rhs: RGBAColor) -> Bool {
         return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a
     }
 }
 
 @inlinable
-public func interpolate(from u: RGBColour, to v: RGBColour, factor t: Float) -> RGBColour {
+public func interpolate(from u: RGBColor, to v: RGBColor, factor t: Float) -> RGBColor {
     return u + (v - u) * t
 }
 
 @inlinable
-public func interpolate(from u: RGBAColour, to v: RGBAColour, factor t: Float) -> RGBAColour {
+public func interpolate(from u: RGBAColor, to v: RGBAColor, factor t: Float) -> RGBAColor {
     return u + (v - u) * t
 }
 
 @inlinable
-public func min(_ a: RGBColour, _ b: RGBColour) -> RGBColour {
-    return RGBColour(min(a.r, b.r), min(a.g, b.g), min(a.b, b.b))
+public func min(_ a: RGBColor, _ b: RGBColor) -> RGBColor {
+    return RGBColor(min(a.r, b.r), min(a.g, b.g), min(a.b, b.b))
 }
 
 @inlinable
-public func max(_ a: RGBColour, _ b: RGBColour) -> RGBColour {
-    return RGBColour(max(a.r, b.r), max(a.g, b.g), max(a.b, b.b))
+public func max(_ a: RGBColor, _ b: RGBColor) -> RGBColor {
+    return RGBColor(max(a.r, b.r), max(a.g, b.g), max(a.b, b.b))
 }
 
 @inlinable
-public func clamp(_ x: RGBColour, min minVec: RGBColour, max maxVec: RGBColour) -> RGBColour {
+public func clamp(_ x: RGBColor, min minVec: RGBColor, max maxVec: RGBColor) -> RGBColor {
     return min(max(minVec, x), maxVec)
 }
 
 // MARK: - Codable Conformance
 
-extension RGBColour : Codable {
+extension RGBColor : Codable {
     @inlinable
     public func encode(to encoder: Encoder) throws {
         var container = encoder.unkeyedContainer()
@@ -463,7 +468,7 @@ extension RGBColour : Codable {
 }
 
 
-extension RGBAColour : Codable {
+extension RGBAColor : Codable {
     @inlinable
     public func encode(to encoder: Encoder) throws {
         var container = encoder.unkeyedContainer()
