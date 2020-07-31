@@ -431,6 +431,12 @@ extension AffineMatrix where Scalar : Real {
         self[2,2] = 1.0 - (xx + yy)
     }
     
+    
+    @inlinable
+    public static func rotate(_ quaternion: Quaternion<Scalar>) -> AffineMatrix {
+        return AffineMatrix(quaternion: quaternion)
+    }
+    
     /// Create a matrix with rotates clockwise around the x axis
     @inlinable
     public static func rotate(x: Angle<Scalar>) -> AffineMatrix {
