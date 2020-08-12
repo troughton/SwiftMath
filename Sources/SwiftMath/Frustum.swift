@@ -199,10 +199,10 @@ public struct Frustum<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, Codab
     @inlinable
     public func withPlanes<T>(_ perform: (UnsafePointer<FrustumPlane<Scalar>>) -> T) -> T {
         assert(MemoryLayout<Frustum>.size == 6 * MemoryLayout<FrustumPlane<Scalar>>.size)
-        return withUnsafePointer(to: self) { frustum in
-            return frustum.withMemoryRebound(to: FrustumPlane<Scalar>.self, capacity: 6) {
-                perform($0)
-            }
+        return withUnsafeBytes(of: self) { frustumBytes in
+            let frustum = frustumBytes.bindMemory(to: FrustumPlane<Scalar>.self)
+            defer { _ = frustumBytes.bindMemory(to: Frustum.self) }
+            return perform(frustum.baseAddress!)
         }
     }
     
