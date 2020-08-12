@@ -5,7 +5,7 @@
 //  Created by Thomas Roughton on 30/07/18.
 //
 
-public struct RGBColor : Equatable {
+public struct RGBColor : Equatable, Hashable {
     public var r: Float
     public var g: Float
     public var b: Float
