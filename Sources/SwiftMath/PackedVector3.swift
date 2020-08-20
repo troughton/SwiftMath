@@ -36,6 +36,15 @@ extension PackedVector3 {
     }
 }
 
+extension PackedVector3 where Scalar == Float {
+    @inlinable
+    public init(_ vector: RGBColor) {
+        self.x = vector.r
+        self.y = vector.g
+        self.z = vector.b
+    }
+}
+
 extension SIMD3 {
     @inlinable
     public init(_ vector: PackedVector3<Scalar>) {
