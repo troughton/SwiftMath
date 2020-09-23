@@ -67,3 +67,22 @@ extension SIMD3 where Scalar: Real, Scalar: BinaryFloatingPoint, Scalar.RawSigni
         return SIMD3<Scalar>(sinTheta * cosPhi, sinTheta * sinPhi, cosTheta)
     }
 }
+
+extension SIMD3 where Scalar: Real, Scalar: BinaryFloatingPoint {
+    @inlinable
+    public static func reflect(incident I: SIMD3<Scalar>, normal N: SIMD3<Scalar>) -> SIMD3<Scalar> {
+        return I - 2.0 * dot(N, I) * N
+    }
+    
+    @inlinable
+    public static func refract(incident I: SIMD3<Scalar>, normal N: SIMD3<Scalar>, eta: Scalar) -> SIMD3<Scalar> {
+        let NdotI = dot(N, I)
+        let sinThetaSq = 1.0 - NdotI * NdotI
+        let k = 1.0 - eta * eta * sinThetaSq;
+        if k < 0.0 {
+            return .zero
+        } else {
+            return eta * I - (eta * NdotI + Scalar.sqrt(k)) * N;
+        }
+    }
+}
