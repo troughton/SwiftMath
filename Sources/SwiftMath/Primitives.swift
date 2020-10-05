@@ -10,7 +10,7 @@ import Swift
 import RealModule
 
 @frozen
-public struct Rect<Scalar: SIMDScalar & BinaryFloatingPoint & Comparable>: Hashable, Codable {
+public struct Rect<Scalar: SIMDScalar>: Hashable, Codable {
     public var origin : SIMD2<Scalar>
     public var size : SIMD2<Scalar>
   
@@ -27,8 +27,88 @@ public struct Rect<Scalar: SIMDScalar & BinaryFloatingPoint & Comparable>: Hasha
     }
     
     @inlinable
+    public init(x: Scalar, y: Scalar, width: Scalar, height: Scalar) {
+        self.origin = SIMD2(x, y)
+        self.size = SIMD2(width, height)
+    }
+    
+    @inlinable
+    public var x: Scalar {
+        get {
+            return self.origin.x
+        }
+        set {
+            self.origin.x = newValue
+        }
+    }
+    
+    @inlinable
+    public var y: Scalar {
+        get {
+            return self.origin.y
+        }
+        set {
+            self.origin.y = newValue
+        }
+    }
+    
+    @inlinable
+    public var width: Scalar {
+        get {
+            return self.size.x
+        }
+        set {
+            self.size.x = newValue
+        }
+    }
+    
+    @inlinable
+    public var height: Scalar {
+        get {
+            return self.size.y
+        }
+        set {
+            self.size.y = newValue
+        }
+    }
+}
+
+extension Rect where Scalar: BinaryFloatingPoint {
+    @inlinable
+    public init<Other: BinaryFloatingPoint & SIMDScalar>(_ other: Rect<Other>) {
+        self.origin = SIMD2(other.origin)
+        self.size = SIMD2(other.size)
+    }
+    
+    @inlinable
+    public init<Other: FixedWidthInteger & SIMDScalar>(_ other: Rect<Other>) {
+        self.origin = SIMD2(other.origin)
+        self.size = SIMD2(other.size)
+    }
+    
+    @inlinable
     public func contains(point: SIMD2<Scalar>) -> Bool {
         let maxPoint = self.origin + self.size
+        return all(point .>= self.origin) && all(point .<= maxPoint)
+    }
+}
+
+extension Rect where Scalar: FixedWidthInteger {
+    @inlinable
+    public init<Other: FixedWidthInteger & SIMDScalar>(clamping other: Rect<Other>) {
+        self.origin = SIMD2(clamping: other.origin)
+        self.size = SIMD2(clamping: other.size)
+    }
+    
+    @inlinable
+    public init<Other: BinaryFloatingPoint & SIMDScalar>(_ other: Rect<Other>, rounding: FloatingPointRoundingRule = .towardZero) {
+        self.origin = SIMD2(other.origin, rounding: rounding)
+        self.size = SIMD2(other.size, rounding: rounding)
+    }
+    
+    @inlinable
+    public func contains(point: SIMD2<Scalar>) -> Bool {
+        let maxPoint = self.origin &+ self.size
         return all(point .>= self.origin) && all(point .<= maxPoint)
     }
 }
