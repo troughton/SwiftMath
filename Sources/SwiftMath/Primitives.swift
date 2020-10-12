@@ -91,6 +91,11 @@ extension Rect where Scalar: BinaryFloatingPoint {
         let maxPoint = self.origin + self.size
         return all(point .>= self.origin) && all(point .<= maxPoint)
     }
+    
+    @inlinable
+    public func intersects(with otherRect: Rect) -> Bool {
+        return all((self.origin + self.size .>= otherRect.origin) .& (otherRect.origin + otherRect.size .>= self.origin))
+    }
 }
 
 extension Rect where Scalar: FixedWidthInteger {
@@ -110,6 +115,11 @@ extension Rect where Scalar: FixedWidthInteger {
     public func contains(point: SIMD2<Scalar>) -> Bool {
         let maxPoint = self.origin &+ self.size
         return all(point .>= self.origin) && all(point .<= maxPoint)
+    }
+
+    @inlinable
+    public func intersects(with otherRect: Rect) -> Bool {
+        return all((self.origin &+ self.size .>= otherRect.origin) .& (otherRect.origin &+ otherRect.size .>= self.origin))
     }
 }
 
