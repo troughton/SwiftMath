@@ -283,34 +283,22 @@ extension AffineMatrix {
     //MARK: matrix operations
     
     @inlinable
-    public static func lookAt(eye: SIMD3<Scalar>, at: SIMD3<Scalar>) -> AffineMatrix {
-        return lookAtLH(eye: eye, at: at)
+    public static func lookAt(eye: SIMD3<Scalar>, at: SIMD3<Scalar>, up: SIMD3<Scalar> = SIMD3(0, 1, 0)) -> AffineMatrix {
+        return lookAtLH(eye: eye, at: at, up: up)
     }
     
     @inlinable
-    public static func lookAtLH(eye: SIMD3<Scalar>, at: SIMD3<Scalar>) -> AffineMatrix {
+    public static func lookAtLH(eye: SIMD3<Scalar>, at: SIMD3<Scalar>, up: SIMD3<Scalar> = SIMD3(0, 1, 0)) -> AffineMatrix {
         let view = normalize(at - eye)
-        return lookAt(eye: eye, view: view)
+        return lookAtLH(eye: eye, forward: view, up: up)
     }
     
     @inlinable
-    public static func lookAtLH(eye: SIMD3<Scalar>, at: SIMD3<Scalar>, up: SIMD3<Scalar>) -> AffineMatrix {
-        let view = normalize(at - eye)
-        return lookAt(eye: eye, view: view, up: up)
-    }
-    
-    @inlinable
-    static func lookAt(eye: SIMD3<Scalar>, view: SIMD3<Scalar>) -> AffineMatrix {
-        var up = SIMD3<Scalar>(0, 1, 0)
+    public static func lookAtLH(eye: SIMD3<Scalar>, forward view: SIMD3<Scalar>, up: SIMD3<Scalar> = SIMD3(0, 1, 0)) -> AffineMatrix {
+        var up = up
         if abs(dot(up, view)) > 0.99 {
             up = SIMD3<Scalar>(1, 0, 0)
         }
-        
-        return self.lookAt(eye: eye, view: view, up: up)
-    }
-    
-    @inlinable
-    static func lookAt(eye: SIMD3<Scalar>, view: SIMD3<Scalar>, up: SIMD3<Scalar>) -> AffineMatrix {
         
         let right = normalize(cross(up, view))
         let u     = cross(view, right)
@@ -322,19 +310,18 @@ extension AffineMatrix {
     }
     
     @inlinable
-    public static func lookAtInv(eye: SIMD3<Scalar>, at: SIMD3<Scalar>) -> AffineMatrix {
+    public static func lookAtInv(eye: SIMD3<Scalar>, at: SIMD3<Scalar>, up: SIMD3<Scalar> = SIMD3(0, 1, 0)) -> AffineMatrix {
         let view = normalize(at - eye)
-        return lookAtInv(eye: eye, view: view)
+        return lookAtInv(eye: eye, forward: view, up: up)
     }
     
     @inlinable
-    public static func lookAtInv(eye: SIMD3<Scalar>, at: SIMD3<Scalar>, up: SIMD3<Scalar>) -> AffineMatrix {
-        let view = normalize(at - eye)
-        return lookAtInv(eye: eye, view: view)
-    }
-    
-    @inlinable
-    static func lookAtInv(eye: SIMD3<Scalar>, view: SIMD3<Scalar>, up: SIMD3<Scalar>) -> AffineMatrix {
+    public static func lookAtInv(eye: SIMD3<Scalar>, forward view: SIMD3<Scalar>, up: SIMD3<Scalar> = SIMD3(0, 1, 0)) -> AffineMatrix {
+        var up = up
+        if abs(dot(up, view)) > 0.99 {
+            up = SIMD3<Scalar>(1, 0, 0)
+        }
+        
         let right = normalize(cross(up, view))
         let u     = cross(view, right)
         
@@ -342,16 +329,6 @@ extension AffineMatrix {
                             SIMD4<Scalar>(right.y, u.y, view.y, eye.y),
                             SIMD4<Scalar>(right.z, u.z, view.z, eye.z)
             )
-    }
-    
-    @inlinable
-    static func lookAtInv(eye: SIMD3<Scalar>, view: SIMD3<Scalar>) -> AffineMatrix {
-        var up = SIMD3<Scalar>(0, 1, 0)
-        if abs(dot(up, view)) > 0.99 {
-            up = SIMD3<Scalar>(1, 0, 0)
-        }
-        
-        return self.lookAtInv(eye: eye, view: view, up: up)
     }
     
     @inlinable
