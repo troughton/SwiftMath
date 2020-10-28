@@ -87,6 +87,32 @@ extension Rect where Scalar: BinaryFloatingPoint {
     }
     
     @inlinable
+    public init(minPoint: SIMD2<Scalar>, maxPoint: SIMD2<Scalar>) {
+        self.origin = minPoint
+        self.size = maxPoint - minPoint
+    }
+    
+    @inlinable
+    public var minPoint: SIMD2<Scalar> {
+        get {
+            return self.origin
+        }
+        set {
+            self.origin = newValue
+        }
+    }
+    
+    @inlinable
+    public var maxPoint: SIMD2<Scalar> {
+        get {
+            return self.origin + self.size
+        }
+        set {
+            self.origin = newValue - self.size
+        }
+    }
+    
+    @inlinable
     public func contains(point: SIMD2<Scalar>) -> Bool {
         let maxPoint = self.origin + self.size
         return all(point .>= self.origin) && all(point .<= maxPoint)
@@ -95,6 +121,52 @@ extension Rect where Scalar: BinaryFloatingPoint {
     @inlinable
     public func intersects(with otherRect: Rect) -> Bool {
         return all((self.origin + self.size .>= otherRect.origin) .& (otherRect.origin + otherRect.size .>= self.origin))
+    }
+    
+    @inlinable
+    public func clipped(to otherRect: Rect<Scalar>) -> Rect {
+        let currentMax = self.origin + self.size
+        let minPoint = pointwiseMin(pointwiseMax(otherRect.origin, self.origin), currentMax)
+        let maxPoint = pointwiseMax(minPoint, pointwiseMin(otherRect.origin + otherRect.size, currentMax))
+        return Rect(origin: minPoint, size: maxPoint - minPoint)
+    }
+    
+    /**
+     * Transforms this bounding box from its local space to the space described by nodeToSpaceTransform.
+     * The result is guaranteed to be axis aligned – that is, with no rotation in the destination space.
+     * It may or may not have the same width or height as its source.
+     * @param nodeToSpaceTransform - The transformation from local to the destination space.
+     * @return - this box in the destination coordinate system.
+     */
+    public func boundingRect(transformedBy nodeToSpaceTransform: AffineMatrix2D<Scalar>) -> Rect {
+        var newMin = SIMD2(repeating: Scalar.infinity)
+        var newMax = SIMD2(repeating: -Scalar.infinity)
+        
+        let minPoint = self.origin
+        let maxPoint = self.origin + self.size
+        
+        //Compute all the vertices for the box.
+        for xToggle in 0..<2 {
+            for yToggle in 0..<2 {
+                let x = xToggle == 0 ? minPoint.x : maxPoint.x;
+                let y = yToggle == 0 ? minPoint.y : maxPoint.y;
+                let vertex = SIMD2<Scalar>(x, y)
+                let transformedVertex = nodeToSpaceTransform.transform(point: vertex)
+                
+                newMin = pointwiseMin(newMin, transformedVertex)
+                newMax = pointwiseMax(newMax, transformedVertex)
+            }
+        }
+        
+        return Rect(origin: newMin, size: newMax - newMin)
+    }
+    
+    public func transformed(by rectTransform: RectTransform<Scalar>) -> Rect<Scalar> {
+        let a = rectTransform * self.origin
+        let b = rectTransform * (self.origin + self.size)
+        let minPoint = pointwiseMin(a, b)
+        let maxPoint = pointwiseMax(a, b)
+        return Rect(origin: minPoint, size: maxPoint - minPoint)
     }
 }
 
@@ -109,6 +181,32 @@ extension Rect where Scalar: FixedWidthInteger {
     public init<Other: BinaryFloatingPoint & SIMDScalar>(_ other: Rect<Other>, rounding: FloatingPointRoundingRule = .towardZero) {
         self.origin = SIMD2(other.origin, rounding: rounding)
         self.size = SIMD2(other.size, rounding: rounding)
+    }
+    
+    @inlinable
+    public init(minPoint: SIMD2<Scalar>, maxPoint: SIMD2<Scalar>) {
+        self.origin = minPoint
+        self.size = maxPoint &- minPoint
+    }
+    
+    @inlinable
+    public var minPoint: SIMD2<Scalar> {
+        get {
+            return self.origin
+        }
+        set {
+            self.origin = newValue
+        }
+    }
+    
+    @inlinable
+    public var maxPoint: SIMD2<Scalar> {
+        get {
+            return self.origin &+ self.size
+        }
+        set {
+            self.origin = newValue &- self.size
+        }
     }
     
     @inlinable
@@ -148,7 +246,7 @@ public struct AxisAlignedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & 
     
     public static var baseBox : AxisAlignedBoundingBox { return AxisAlignedBoundingBox(min: SIMD3<Scalar>(repeating: Scalar.infinity), max: SIMD3<Scalar>(repeating: -Scalar.infinity)) }
     
-        public static var unitBox : AxisAlignedBoundingBox { return AxisAlignedBoundingBox(min: SIMD3<Scalar>(repeating: -0.5), max: SIMD3<Scalar>(repeating: 0.5)) }
+    public static var unitBox : AxisAlignedBoundingBox { return AxisAlignedBoundingBox(min: SIMD3<Scalar>(repeating: -0.5), max: SIMD3<Scalar>(repeating: 0.5)) }
     
     @inlinable
     public var width : Scalar {
@@ -305,9 +403,8 @@ public struct AxisAlignedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & 
      * @return this box in the destination coordinate system.
      */
     public func transformed(by nodeToSpaceTransform: Matrix4x4<Scalar>) -> AxisAlignedBoundingBox {
-        
-        var minX = Scalar.infinity, minY = Scalar.infinity, minZ = Scalar.infinity
-        var maxX = -Scalar.infinity, maxY = -Scalar.infinity, maxZ = -Scalar.infinity
+        var newMin = SIMD3(repeating: Scalar.infinity)
+        var newMax = SIMD3(repeating: -Scalar.infinity)
         
         //Compute all the vertices for the box.
         for xToggle in 0..<2 {
@@ -319,17 +416,13 @@ public struct AxisAlignedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & 
                     let vertex = SIMD3<Scalar>(x, y, z);
                     let transformedVertex = nodeToSpaceTransform.multiplyAndProject(vertex)
                     
-                    if (transformedVertex.x < minX) { minX = transformedVertex.x; }
-                    if (transformedVertex.y < minY) { minY = transformedVertex.y; }
-                    if (transformedVertex.z < minZ) { minZ = transformedVertex.z; }
-                    if (transformedVertex.x > maxX) { maxX = transformedVertex.x; }
-                    if (transformedVertex.y > maxY) { maxY = transformedVertex.y; }
-                    if (transformedVertex.z > maxZ) { maxZ = transformedVertex.z; }
+                    newMin = pointwiseMin(newMin, transformedVertex)
+                    newMax = pointwiseMax(newMax, transformedVertex)
                 }
             }
         }
         
-        return AxisAlignedBoundingBox(min: SIMD3<Scalar>(minX, minY, minZ), max: SIMD3<Scalar>(maxX, maxY, maxZ));
+        return AxisAlignedBoundingBox(min: newMin, max: newMax)
     }
     
     /**
@@ -340,9 +433,8 @@ public struct AxisAlignedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & 
      * @return - this box in the destination coordinate system.
      */
     public func transformed(by nodeToSpaceTransform: AffineMatrix<Scalar>) -> AxisAlignedBoundingBox {
-        
-        var minX = Scalar.infinity, minY = Scalar.infinity, minZ = Scalar.infinity
-        var maxX = -Scalar.infinity, maxY = -Scalar.infinity, maxZ = -Scalar.infinity
+        var newMin = SIMD3(repeating: Scalar.infinity)
+        var newMax = SIMD3(repeating: -Scalar.infinity)
         
         //Compute all the vertices for the box.
         for xToggle in 0..<2 {
@@ -354,17 +446,13 @@ public struct AxisAlignedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & 
                     let vertex = SIMD4<Scalar>(x, y, z, 1)
                     let transformedVertex = nodeToSpaceTransform * vertex
                     
-                    if (transformedVertex.x < minX) { minX = transformedVertex.x; }
-                    if (transformedVertex.y < minY) { minY = transformedVertex.y; }
-                    if (transformedVertex.z < minZ) { minZ = transformedVertex.z; }
-                    if (transformedVertex.x > maxX) { maxX = transformedVertex.x; }
-                    if (transformedVertex.y > maxY) { maxY = transformedVertex.y; }
-                    if (transformedVertex.z > maxZ) { maxZ = transformedVertex.z; }
+                    newMin = pointwiseMin(newMin, transformedVertex.xyz)
+                    newMax = pointwiseMax(newMax, transformedVertex.xyz)
                 }
             }
         }
         
-        return AxisAlignedBoundingBox(min: SIMD3<Scalar>(minX, minY, minZ), max: SIMD3<Scalar>(maxX, maxY, maxZ));
+        return AxisAlignedBoundingBox(min: newMin, max: newMax)
     }
     
     @inlinable

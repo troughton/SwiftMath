@@ -42,7 +42,7 @@ public struct Matrix3x3<Scalar: SIMDScalar & BinaryFloatingPoint> : Hashable {
             case 0: return self.c0
             case 1: return self.c1
             case 2: return self.c2
-            default: preconditionFailure("Index outside of bounds")
+            default: preconditionFailure("Index out of bounds")
             }
         }
         
@@ -51,7 +51,7 @@ public struct Matrix3x3<Scalar: SIMDScalar & BinaryFloatingPoint> : Hashable {
             case 0: self.c0 = newValue
             case 1: self.c1 = newValue
             case 2: self.c2 = newValue
-            default: preconditionFailure("Index outside of bounds")
+            default: preconditionFailure("Index out of bounds")
             }
         }
     }

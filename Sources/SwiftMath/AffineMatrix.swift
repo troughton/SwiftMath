@@ -70,7 +70,7 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
             case 1: return SIMD4(r0.y, r1.y, r2.y, 0)
             case 2: return SIMD4(r0.z, r1.z, r2.z, 0)
             case 3: return SIMD4(r0.w, r1.w, r2.w, 1)
-            default: preconditionFailure("Index outside of bounds")
+            default: preconditionFailure("Index out of bounds")
             }
         }
         
@@ -80,7 +80,7 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
             case 1: self.r0.y = newValue.x; self.r1.y = newValue.y; self.r2.y = newValue.z; assert(newValue.w == 0)
             case 2: self.r0.z = newValue.x; self.r1.z = newValue.y; self.r2.z = newValue.z; assert(newValue.w == 0)
             case 3: self.r0.w = newValue.x; self.r1.w = newValue.y; self.r2.w = newValue.z; assert(newValue.w == 1)
-            default: preconditionFailure("Index outside of bounds")
+            default: preconditionFailure("Index out of bounds")
             }
         }
     }
@@ -93,7 +93,7 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
             case 1: return self.r1
             case 2: return self.r2
             case 3: return SIMD4(0, 0, 0, 1)
-            default: preconditionFailure("Index outside of bounds")
+            default: preconditionFailure("Index out of bounds")
             }
         }
         
@@ -103,7 +103,7 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
             case 1: self.r1 = newValue
             case 2: self.r2 = newValue
             case 3: assert(newValue == SIMD4(0, 0, 0, 1))
-            default: preconditionFailure("Index outside of bounds")
+            default: preconditionFailure("Index out of bounds")
             }
         }
     }
@@ -120,7 +120,7 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
                 return self.r2[col]
             case 3:
                 return SIMD4<Scalar>(0, 0, 0, 1)[col]
-            default: preconditionFailure("Index outside of bounds")
+            default: preconditionFailure("Index out of bounds")
             }
         }
         
@@ -134,7 +134,7 @@ public struct AffineMatrix<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, 
                 self.r2[col] = newValue
             case 3:
                 break
-            default: preconditionFailure("Index outside of bounds")
+            default: preconditionFailure("Index out of bounds")
             }
         }
     }

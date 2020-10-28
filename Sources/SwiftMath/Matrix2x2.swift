@@ -41,7 +41,7 @@ public struct Matrix2x2<Scalar: SIMDScalar & BinaryFloatingPoint> : Hashable {
             switch col {
             case 0: return self.columns.xy
             case 1: return self.columns.zw
-            default: preconditionFailure("Index outside of bounds")
+            default: preconditionFailure("Index out of bounds")
             }
         }
         
@@ -49,7 +49,7 @@ public struct Matrix2x2<Scalar: SIMDScalar & BinaryFloatingPoint> : Hashable {
             switch col {
             case 0: self.columns.xy = newValue
             case 1: self.columns.zw = newValue
-            default: preconditionFailure("Index outside of bounds")
+            default: preconditionFailure("Index out of bounds")
             }
         }
     }

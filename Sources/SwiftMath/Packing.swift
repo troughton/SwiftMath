@@ -71,7 +71,6 @@ public struct Float16 : Hashable, Codable {
     }
 }
 
-typealias Half = Float16
 
 extension Float {
     @inlinable
@@ -118,6 +117,7 @@ extension Float16 : ExpressibleByFloatLiteral {
     }
 }
 
+typealias Half = Float16
 
 public enum Packing {
     
