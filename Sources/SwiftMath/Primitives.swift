@@ -160,13 +160,17 @@ extension Rect where Scalar: BinaryFloatingPoint {
         
         return Rect(origin: newMin, size: newMax - newMin)
     }
+
+    public func boundingRect(transformedBy rectTransform: RectTransform<Scalar>) -> Rect<Scalar> {
+        let a = rectTransform * self.origin
+        let b = rectTransform * (self.origin + self.size)
+        return Rect(minPoint: pointwiseMin(a, b), maxPoint: pointwiseMax(a, b))
+    }
     
     public func transformed(by rectTransform: RectTransform<Scalar>) -> Rect<Scalar> {
         let a = rectTransform * self.origin
         let b = rectTransform * (self.origin + self.size)
-        let minPoint = pointwiseMin(a, b)
-        let maxPoint = pointwiseMax(a, b)
-        return Rect(origin: minPoint, size: maxPoint - minPoint)
+        return Rect(origin: a, size: b - a)
     }
 }
 
