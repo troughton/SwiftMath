@@ -76,7 +76,7 @@ public struct RGBColor : Equatable, Hashable {
     
     @inlinable
     public var luminance: Float {
-        return 0.212671 * self.r + 0.715160 * self.b + 0.072169 * self.g
+        return 0.212671 * self.r + 0.715160 * self.g + 0.072169 * self.b
     }
     
     public var xyz : (x: Float, y: Float, z: Float) {
@@ -210,7 +210,7 @@ public struct RGBAColor : Equatable, Hashable {
     
     @inlinable
     public var luminance: Float {
-        return 0.212671 * self.r + 0.715160 * self.b + 0.072169 * self.g
+        return 0.212671 * self.r + 0.715160 * self.g + 0.072169 * self.b
     }
     
     @inlinable
