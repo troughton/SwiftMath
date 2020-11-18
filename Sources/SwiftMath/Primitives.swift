@@ -623,7 +623,8 @@ public struct Ray<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, Codable {
         return ray
     }
     
-    public func intersectionAt(y: Scalar) -> SIMD3<Scalar> {
+    public func intersectionAt(y: Scalar) -> SIMD3<Scalar>? {
+        guard self.direction.y != 0.0 else { return nil }
         let t = (y - self.origin.y) / self.direction.y
         return self.at(t: t)
     }
