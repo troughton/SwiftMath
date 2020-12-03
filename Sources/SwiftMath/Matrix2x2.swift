@@ -2,7 +2,7 @@
 // License: https://github.com/SwiftGFX/SwiftMath#license-bsd-2-clause
 //
 
-import Swift
+import RealModule
 
 /// A column-major 2x2 matrix.
 @frozen
@@ -135,6 +135,21 @@ extension Matrix2x2 {
     @inlinable
     public init(_ m: Matrix4x4<Scalar>) {
         self.init(m[0].xy, m[1].xy)
+    }
+}
+
+extension Matrix2x2 where Scalar: Real {
+    @inlinable
+    public var polarDecomposition: (rotation: Angle<Scalar>, scale: Matrix2x2<Scalar>) {
+        let theta = Scalar.atan2(y: self[1, 0] - self[0, 1], x: self[0, 0] + self[1, 1])
+        let sinTheta = Scalar.sin(theta)
+        let cosTheta = Scalar.cos(theta)
+        
+        let Rt = Matrix2x2(SIMD2(cosTheta, -sinTheta), SIMD2(sinTheta, cosTheta))
+        
+        let S = Rt * self
+        
+        return (Angle(radians: theta), S)
     }
 }
 

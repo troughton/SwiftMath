@@ -280,6 +280,15 @@ extension AffineMatrix2D where Scalar : Real {
                                             translation: SIMD2<Scalar>) -> AffineMatrix2D {
         return AffineMatrix2D.translate(by: translation) * (AffineMatrix2D.rotate(rotation) * AffineMatrix2D.scale(by: scale))
     }
+    
+    // Reference: http://www.cs.cornell.edu/courses/cs4620/2014fa/lectures/polarnotes.pdf
+    @inlinable
+    public var polarDecomposition: (translation: SIMD2<Scalar>, rotation: Angle<Scalar>, scale: Matrix2x2<Scalar>) {
+        let translation = self.translation
+        
+        let (rotation, scale) = Matrix2x2(self).polarDecomposition
+        return (translation, rotation, scale)
+    }
 }
 
 extension AffineMatrix2D {

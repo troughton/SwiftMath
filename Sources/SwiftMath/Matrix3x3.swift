@@ -206,6 +206,9 @@ extension Matrix3x3 where Scalar : Real {
         self[2,1] = yz + wx
         self[2,2] = 1.0 - (xx + yy)
     }
+    
+    // public var polarDecomposition: (rotation: Matrix3x3<Scalar>, scale: Matrix3x3<Scalar>)
+    // TODO: implement 3x3 matrix polar decomposition based on https://github.com/martinbis11/polar-decomposition-3x3
 }
 
 extension Matrix3x3: CustomStringConvertible {
