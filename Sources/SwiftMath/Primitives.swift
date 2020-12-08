@@ -138,6 +138,7 @@ extension Rect where Scalar: BinaryFloatingPoint {
      * @param nodeToSpaceTransform - The transformation from local to the destination space.
      * @return - this box in the destination coordinate system.
      */
+    @inlinable
     public func boundingRect(transformedBy nodeToSpaceTransform: AffineMatrix2D<Scalar>) -> Rect {
         var newMin = SIMD2(repeating: Scalar.infinity)
         var newMax = SIMD2(repeating: -Scalar.infinity)
@@ -160,13 +161,15 @@ extension Rect where Scalar: BinaryFloatingPoint {
         
         return Rect(origin: newMin, size: newMax - newMin)
     }
-
+    
+    @inlinable
     public func boundingRect(transformedBy rectTransform: RectTransform<Scalar>) -> Rect<Scalar> {
         let a = rectTransform * self.origin
         let b = rectTransform * (self.origin + self.size)
         return Rect(minPoint: pointwiseMin(a, b), maxPoint: pointwiseMax(a, b))
     }
     
+    @inlinable
     public func transformed(by rectTransform: RectTransform<Scalar>) -> Rect<Scalar> {
         let a = rectTransform * self.origin
         let b = rectTransform * (self.origin + self.size)
@@ -387,11 +390,13 @@ public struct AxisAlignedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & 
                 self.maxZ > otherBox.maxZ
     }
 
+    @inlinable
     public mutating func combine(with box: AxisAlignedBoundingBox) {
         self.minPoint = pointwiseMin(self.minPoint, box.minPoint)
         self.maxPoint = pointwiseMax(self.maxPoint, box.maxPoint)
     }
     
+    @inlinable
     public static func combine(_ a : AxisAlignedBoundingBox, _ b : AxisAlignedBoundingBox) -> AxisAlignedBoundingBox {
         var result = a
         result.combine(with: b)
@@ -406,6 +411,7 @@ public struct AxisAlignedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & 
      * @param nodeToSpaceTransform The transformation from local to the destination space.
      * @return this box in the destination coordinate system.
      */
+    @inlinable
     public func transformed(by nodeToSpaceTransform: Matrix4x4<Scalar>) -> AxisAlignedBoundingBox {
         var newMin = SIMD3(repeating: Scalar.infinity)
         var newMax = SIMD3(repeating: -Scalar.infinity)
@@ -436,6 +442,7 @@ public struct AxisAlignedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & 
      * @param nodeToSpaceTransform - The transformation from local to the destination space.
      * @return - this box in the destination coordinate system.
      */
+    @inlinable
     public func transformed(by nodeToSpaceTransform: AffineMatrix<Scalar>) -> AxisAlignedBoundingBox {
         var newMin = SIMD3(repeating: Scalar.infinity)
         var newMax = SIMD3(repeating: -Scalar.infinity)
@@ -494,7 +501,7 @@ public struct AxisAlignedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & 
         return maxZ;
     }
     
-    
+    @inlinable
     public static func ==(lhs: AxisAlignedBoundingBox, rhs: AxisAlignedBoundingBox) -> Bool {
         return lhs.minPoint == rhs.minPoint && lhs.maxPoint == rhs.maxPoint
     }
@@ -519,10 +526,12 @@ public struct Disk<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, Codable 
 public struct OrientedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & Real>: Hashable, Codable {
     public var transform : AffineMatrix<Scalar>
     
+    @inlinable
     public init(transform: AffineMatrix<Scalar>) {
         self.transform = transform
     }
     
+    @inlinable
     public init(aabb: AxisAlignedBoundingBox<Scalar>, inSpace transform: AffineMatrix<Scalar>) {
         let aabbTransform = AffineMatrix<Scalar>.scaleRotateTranslate(scale: aabb.size, rotation: Quaternion.identity, translation: aabb.centre)
         self.init(transform: transform * aabbTransform)
@@ -533,19 +542,23 @@ public struct OrientedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & Rea
 public struct ProjectedBoundingBox<Scalar: SIMDScalar & BinaryFloatingPoint & Real>: Hashable, Codable {
     public var transform : Matrix4x4<Scalar>
     
+    @inlinable
     public init(transform: Matrix4x4<Scalar> = Matrix4x4<Scalar>.identity) {
         self.transform = transform
     }
     
+    @inlinable
     public init(aabb: AxisAlignedBoundingBox<Scalar>, inSpace transform: Matrix4x4<Scalar>) {
         let aabbTransform = AffineMatrix<Scalar>.scaleRotateTranslate(scale: aabb.size, rotation: Quaternion.identity, translation: aabb.centre)
         self.init(transform: transform * aabbTransform)
     }
     
+    @inlinable
     public init(transform: AffineMatrix<Scalar>) {
         self.transform = Matrix4x4<Scalar>(transform)
     }
     
+    @inlinable
     public init(aabb: AxisAlignedBoundingBox<Scalar>, inSpace transform: AffineMatrix<Scalar>) {
         let aabbTransform = AffineMatrix<Scalar>.scaleRotateTranslate(scale: aabb.size, rotation: Quaternion.identity, translation: aabb.centre)
         self.init(transform: transform * aabbTransform)
@@ -588,25 +601,30 @@ public struct Ray<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, Codable {
     public var origin : SIMD3<Scalar>
     public var direction : SIMD3<Scalar>
     
+    @inlinable
     public init(origin: SIMD3<Scalar> = SIMD3<Scalar>(repeating: 0), direction: SIMD3<Scalar> = SIMD3<Scalar>(repeating: 0)) {
         self.origin = origin
         self.direction = direction
     }
     
+    @inlinable
     public init(fromScreenSpaceX x: Scalar, y: Scalar, mvp: Matrix4x4<Scalar>) {
         self = Ray(fromScreenSpaceX: x, y: y, inverseMVP: mvp.inverse)
     }
     
+    @inlinable
     public init(fromScreenSpaceX x: Scalar, y: Scalar, inverseMVP: Matrix4x4<Scalar>) {
         let ray = Ray(origin: SIMD3<Scalar>(x, y, 0), direction: SIMD3<Scalar>(0, 0, 1))
         let viewRay = inverseMVP * ray
         self = viewRay
     }
     
+    @inlinable
     public func at(t: Scalar) -> SIMD3<Scalar> {
         return self.origin + t * self.direction
     }
     
+    @inlinable
     public static func *(lhs: Matrix4x4<Scalar>, rhs: Ray) -> Ray {
         var ray = Ray()
         
@@ -623,12 +641,14 @@ public struct Ray<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, Codable {
         return ray
     }
     
+    @inlinable
     public func intersectionAt(y: Scalar) -> SIMD3<Scalar>? {
         guard self.direction.y != 0.0 else { return nil }
         let t = (y - self.origin.y) / self.direction.y
         return self.at(t: t)
     }
     
+    @inlinable
     public func intersects(with box: AxisAlignedBoundingBox<Scalar>) -> Bool {
         // r.dir is unit direction vector of ray
         let dirFrac = SIMD3<Scalar>(repeating: 1.0) / self.direction
@@ -658,6 +678,7 @@ public struct Ray<Scalar: SIMDScalar & BinaryFloatingPoint>: Hashable, Codable {
         return true
     }
     
+    @inlinable
     public func intersections(with box: AxisAlignedBoundingBox<Scalar>) -> (near: Scalar, far: Scalar)? {
         var t1 = SIMD3<Scalar>()
         var t2 = SIMD3<Scalar>() // vectors to hold the T-values for every direction
