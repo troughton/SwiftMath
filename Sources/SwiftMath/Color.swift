@@ -269,6 +269,12 @@ extension RGBColor {
     }
 }
 
+extension RGBAColor {
+    public init(linearSRGBFrom c: OklabColor, alpha: Float) {
+        self.init(RGBColor(linearSRGBFrom: c), alpha)
+    }
+}
+
 extension XYZColor {
     public init(_ labColor: OklabColor) {
         let m1 = Matrix3x3<Float>(SIMD3(0.8189330101, 0.3618667424, -0.1288597137),
