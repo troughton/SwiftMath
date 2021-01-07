@@ -11,11 +11,16 @@ public struct Angle<Scalar: BinaryFloatingPoint & Real> : Hashable {
     /// The value of the angle in degrees
     @inlinable
     public var degrees: Scalar {
-        return radians * 180.0 / .pi
+        get {
+            return radians * 180.0 / .pi
+        }
+        set {
+            radians = newValue * .pi / 180.0
+        }
     }
 	
     /// The value of the angle in radians
-    public let radians: Scalar
+    public var radians: Scalar
 
 	/// Creates an instance using the value in radians
     @inlinable
