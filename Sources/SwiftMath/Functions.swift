@@ -64,6 +64,16 @@ public func saturate<S: SIMD>(_ x: S) -> S where S.Scalar: FloatingPoint {
     return clamp(x, min: S.zero, max: S.one)
 }
 
+@inlinable
+public func saturate(_ c: RGBColor) -> RGBColor {
+    return RGBColor(saturate(c.r), saturate(c.g), saturate(c.b))
+}
+
+@inlinable
+public func saturate(_ c: RGBAColor) -> RGBAColor {
+    return RGBAColor(saturate(c.r), saturate(c.g), saturate(c.b), saturate(c.a))
+}
+
 /// Performs a linear interpolation between a and b by the interpolant t
 ///
 /// - parameter a: start value
