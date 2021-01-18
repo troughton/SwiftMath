@@ -1,6 +1,6 @@
 //
 //  Color.swift
-//  LlamaCore
+//  SwiftMath
 //
 //  Created by Thomas Roughton on 30/07/18.
 //
@@ -505,9 +505,23 @@ extension OklabColor {
         result /= rhs
         return result
     }
+    
+    @inlinable
+    public static func /(lhs: Float, rhs: OklabColor) -> OklabColor {
+        return OklabColor(lhs / rhs.L, lhs / rhs.a, lhs / rhs.b)
+    }
 }
 
 extension RGBColor {
+    @inlinable
+    public static prefix func -(lhs: RGBColor) -> RGBColor {
+        var result = lhs
+        result.r = -result.r
+        result.g = -result.g
+        result.b = -result.b
+        return result
+    }
+    
     @inlinable
     public static func +=(lhs: inout RGBColor, rhs: RGBColor) {
         lhs.r += rhs.r
@@ -586,12 +600,27 @@ extension RGBColor {
     }
     
     @inlinable
+    public static func /(lhs: Float, rhs: RGBColor) -> RGBColor {
+        return RGBColor(lhs / rhs.r, lhs / rhs.g, lhs / rhs.b)
+    }
+    
+    @inlinable
     public static func ==(lhs: RGBColor, rhs: RGBColor) -> Bool {
         return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b
     }
 }
 
 extension RGBAColor {
+    @inlinable
+    public static prefix func -(lhs: RGBAColor) -> RGBAColor {
+        var result = lhs
+        result.r = -result.r
+        result.g = -result.g
+        result.b = -result.b
+        result.a = -result.a
+        return result
+    }
+    
     @inlinable
     public static func +=(lhs: inout RGBAColor, rhs: RGBAColor) {
         lhs.r += rhs.r
@@ -668,6 +697,11 @@ extension RGBAColor {
     }
     
     @inlinable
+    public static func /(lhs: Float, rhs: RGBAColor) -> RGBAColor {
+        return RGBAColor(lhs / rhs.r, lhs / rhs.g, lhs / rhs.b, lhs / rhs.a)
+    }
+    
+    @inlinable
     public static func ==(lhs: RGBAColor, rhs: RGBAColor) -> Bool {
         return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a
     }
@@ -733,6 +767,51 @@ public func max(_ a: RGBColor, _ b: RGBColor) -> RGBColor {
 
 @inlinable
 public func clamp(_ x: RGBColor, min minVec: RGBColor, max maxVec: RGBColor) -> RGBColor {
+    return min(max(minVec, x), maxVec)
+}
+
+@inlinable
+public func min(_ a: RGBAColor, _ b: RGBAColor) -> RGBAColor {
+    return RGBAColor(min(a.r, b.r), min(a.g, b.g), min(a.b, b.b), min(a.a, b.a))
+}
+
+@inlinable
+public func max(_ a: RGBAColor, _ b: RGBAColor) -> RGBAColor {
+    return RGBAColor(max(a.r, b.r), max(a.g, b.g), max(a.b, b.b), max(a.a, b.a))
+}
+
+@inlinable
+public func clamp(_ x: RGBAColor, min minVec: RGBAColor, max maxVec: RGBAColor) -> RGBAColor {
+    return min(max(minVec, x), maxVec)
+}
+
+@inlinable
+public func min(_ a: OklabColor, _ b: OklabColor) -> OklabColor {
+    return OklabColor(min(a.L, b.L), min(a.a, b.a), min(a.b, b.b))
+}
+
+@inlinable
+public func max(_ a: OklabColor, _ b: OklabColor) -> OklabColor {
+    return OklabColor(max(a.L, b.L), max(a.a, b.a), max(a.b, b.b))
+}
+
+@inlinable
+public func clamp(_ x: OklabColor, min minVec: OklabColor, max maxVec: OklabColor) -> OklabColor {
+    return min(max(minVec, x), maxVec)
+}
+
+@inlinable
+public func min(_ a: XYZColor, _ b: XYZColor) -> XYZColor {
+    return XYZColor(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z))
+}
+
+@inlinable
+public func max(_ a: XYZColor, _ b: XYZColor) -> XYZColor {
+    return XYZColor(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z))
+}
+
+@inlinable
+public func clamp(_ x: XYZColor, min minVec: XYZColor, max maxVec: XYZColor) -> XYZColor {
     return min(max(minVec, x), maxVec)
 }
 
