@@ -124,4 +124,22 @@ class MatrixTests: XCTestCase {
             }
         }
     }
+    
+    func testAffineMatrix2DDecomposition() {
+        let scaleMatrix = AffineMatrix2D<Float>.scale(sx: 1.8, sy: 0.7)
+        let theta = Angle<Float>(degrees: -48)
+        let rotationMatrix = AffineMatrix2D<Float>.rotate(theta)
+        let translationMatrix = AffineMatrix2D<Float>.translate(tx: 0.1, ty: -4.3)
+        let trs = translationMatrix * rotationMatrix * scaleMatrix
+        
+        let decomposition = trs.polarDecomposition
+        
+        XCTAssertEqual(decomposition.translation.x, translationMatrix.c2.x, accuracy: 0.0001)
+        XCTAssertEqual(decomposition.translation.y, translationMatrix.c2.y, accuracy: 0.0001)
+        
+        XCTAssertEqual(decomposition.rotation.radians, theta.radians, accuracy: 0.0001)
+        
+        XCTAssertEqual(decomposition.scale[0, 0], scaleMatrix[0, 0], accuracy: 0.0001)
+        XCTAssertEqual(decomposition.scale[1, 1], scaleMatrix[1, 1], accuracy: 0.0001)
+    }
 }

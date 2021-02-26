@@ -262,15 +262,7 @@ extension AffineMatrix2D where Scalar : Real {
     /// Returns a transformation matrix that rotates clockwise around the z axis
     @inlinable
     public static func rotate(_ z: Angle<Scalar>) -> AffineMatrix2D {
-        let (sin: sz, cos: cz) = Angle<Scalar>.sincos(z)
-        
-        var r = AffineMatrix2D()
-        r[0,0] = cz
-        r[0,1] = sz
-        r[1,0] = -sz
-        r[1,1] = cz
-        
-        return r
+        return AffineMatrix2D(Matrix2x2<Scalar>.rotate(z))
     }
     
     /// Returns a transformation matrix which can be used to scale, rotate and translate vectors

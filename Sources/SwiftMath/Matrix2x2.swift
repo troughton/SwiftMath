@@ -136,18 +136,41 @@ extension Matrix2x2 {
     public init(_ m: Matrix4x4<Scalar>) {
         self.init(m[0].xy, m[1].xy)
     }
+    
+    @inlinable
+    public static func scale(sx: Scalar, sy: Scalar) -> Matrix2x2 {
+        return Matrix2x2.scale(by: SIMD2<Scalar>(sx, sy))
+    }
+    
+    @inlinable
+    public static func scale(by s: SIMD2<Scalar>) -> Matrix2x2 {
+        return Matrix2x2(diagonal: s)
+    }
+    
 }
 
 extension Matrix2x2 where Scalar: Real {
+    /// Returns a transformation matrix that rotates clockwise around the z axis
+    @inlinable
+    public static func rotate(_ z: Angle<Scalar>) -> Matrix2x2 {
+        let (sin: sz, cos: cz) = Angle<Scalar>.sincos(z)
+        
+        var r = Matrix2x2()
+        r[0,0] = cz
+        r[0,1] = sz
+        r[1,0] = -sz
+        r[1,1] = cz
+        
+        return r
+    }
+    
+    // Reference: http://www.cs.cornell.edu/courses/cs4620/2014fa/lectures/polarnotes.pdf
     @inlinable
     public var polarDecomposition: (rotation: Angle<Scalar>, scale: Matrix2x2<Scalar>) {
-        let theta = Scalar.atan2(y: self[1, 0] - self[0, 1], x: self[0, 0] + self[1, 1])
-        let sinTheta = Scalar.sin(theta)
-        let cosTheta = Scalar.cos(theta)
+        let theta = -Scalar.atan2(y: self[1, 0] - self[0, 1], x: self[0, 0] + self[1, 1])
+        let R = Matrix2x2.rotate(Angle(radians: theta))
         
-        let Rt = Matrix2x2(SIMD2(cosTheta, -sinTheta), SIMD2(sinTheta, cosTheta))
-        
-        let S = Rt * self
+        let S = R.transpose * self
         
         return (Angle(radians: theta), S)
     }
