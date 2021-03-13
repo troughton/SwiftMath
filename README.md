@@ -1,6 +1,8 @@
 SwiftMath
 =========
 
+**This package has moved to [SubstrateMath](https://github.com/troughton/Substrate) within the [Substrate](https://github.com/troughton/Substrate) repository.**
+
 Mathematics library for Swift
 
 License (BSD 2-clause)
